@@ -1,0 +1,36 @@
+{
+  "name": "jojo1981/typed-collection",
+  "description": "Typed collection",
+  "keywords": [
+    "data",
+    "structure",
+    "collection",
+    "typed"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "readme": "README.md",
+  "authors": [
+    {
+      "name": "Joost Nijhuis",
+      "email": "jnijhuis81@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^7.1"
+  },
+  "require-dev": {
+    "php-coveralls/php-coveralls": "2.1.x-dev",
+    "phpunit/phpunit": "7.5.x-dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Jojo1981\\TypedCollection\\": "src/"
+    }
+  },
+  "config": {
+    "bin-dir": "bin",
+    "sort-packages": true
+  }
+}
