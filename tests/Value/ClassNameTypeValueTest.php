@@ -26,12 +26,12 @@ class ClassNameTypeValueTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider getInvalidData
+     * @dataProvider getInvalidValueStrings
      *
      * @param string $value
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
      * @return void
+     *@throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function isValidValueShouldReturnFalseForInvalidValue(string $value): void
     {
@@ -40,12 +40,12 @@ class ClassNameTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getInvalidData
+     * @dataProvider getInvalidValueStrings
      *
      * @param string $value
      * @param string $message
-     * @throws ValueException
      * @return void
+     *@throws ValueException
      */
     public function constructWithInvalidTypeShouldThrowValueException(string $value, string $message): void
     {
@@ -55,12 +55,12 @@ class ClassNameTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidData
+     * @dataProvider getValidValueStrings
      *
      * @param string $value
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
      * @return void
+     *@throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function isValidValueShouldReturnTrueForValidValue(string $value): void
     {
@@ -69,14 +69,14 @@ class ClassNameTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidData
+     * @dataProvider getValidValueStrings
      *
      * @param string $value
      * @param string $mappedValue
-     * @throws InvalidArgumentException
-     * @throws ValueException
-     * @throws ExpectationFailedException
      * @return void
+     *@throws ValueException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function constructWithValidValueShouldReturnCorrectMappedValue(string $value, string $mappedValue): void
     {
@@ -129,42 +129,46 @@ class ClassNameTypeValueTest extends TestCase
 
     /**
      * @test
+     * @dataProvider getInvalidDataMap
      *
+     * @param string $value
+     * @param mixed $invalidData
      * @throws InvalidArgumentException
      * @throws ValueException
      * @throws ExpectationFailedException
      * @return void
      */
-    public function isValidDataShouldReturnFalseWhenDataIsNotConformTheClassNameType(): void
+    public function isValidDataShouldReturnFalseWhenDataIsNotConformTheClassNameType(
+        string $value,
+        $invalidData
+    ): void
     {
-        $classNameTypeValue1 = new ClassNameTypeValue(TestEntityBase::class);
-        $classNameTypeValue2 = new ClassNameTypeValue(TestEntity::class);
-
-        $this->assertFalse($classNameTypeValue1->isValidData(new TestEntity()));
-        $this->assertFalse($classNameTypeValue2->isValidData(new TestEntityBase()));
+        $this->assertFalse((new ClassNameTypeValue($value))->isValidData($invalidData));
     }
 
     /**
      * @test
+     * @dataProvider getValidDataMap
      *
+     * @param string $value
+     * @param mixed $validData
      * @throws InvalidArgumentException
      * @throws ValueException
      * @throws ExpectationFailedException
      * @return void
      */
-    public function isValidDataShouldReturnTrueWhenDataIsConformTheClassNameType(): void
+    public function isValidDataShouldReturnTrueWhenDataIsConformTheClassNameType(
+        string $value,
+        $validData
+    ): void
     {
-        $classNameTypeValue1 = new ClassNameTypeValue(TestEntityBase::class);
-        $classNameTypeValue2 = new ClassNameTypeValue(TestEntity::class);
-
-        $this->assertTrue($classNameTypeValue1->isValidData(new TestEntityBase()));
-        $this->assertTrue($classNameTypeValue2->isValidData(new TestEntity()));
+        $this->assertTrue((new ClassNameTypeValue($value))->isValidData($validData));
     }
 
     /**
      * @return array[]
      */
-    public function getInvalidData(): array
+    public function getInvalidValueStrings(): array
     {
         return [
             ['', 'Value can not be empty'],
@@ -201,12 +205,54 @@ class ClassNameTypeValueTest extends TestCase
     /**
      * @return array[]
      */
-    public function getValidData(): array
+    public function getValidValueStrings(): array
     {
         return [
             [__CLASS__, __CLASS__],
             [ClassNameTypeValue::class, ClassNameTypeValue::class],
             ['\\' . ClassNameTypeValue::class, ClassNameTypeValue::class]
+        ];
+    }
+
+
+    /**
+     * @return array[]
+     */
+    public function getValidDataMap(): array
+    {
+        return [
+            [TestEntity::class, new TestEntity()],
+            ['\\' . TestEntity::class, new TestEntity()],
+            [TestEntityBase::class, new TestEntityBase()],
+            ['\\' . TestEntityBase::class, new TestEntityBase()],
+            [\stdClass::class, new \stdClass()]
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getInvalidDataMap(): array
+    {
+        return [
+            [TestEntity::class, new TestEntityBase()],
+            [TestEntity::class, new \stdClass()],
+            [TestEntityBase::class, new TestEntity()],
+            [TestEntityBase::class, new \stdClass()],
+            [\stdClass::class, new TestEntityBase()],
+            [\stdClass::class, new TestEntity()],
+            [\stdClass::class, []],
+            [\stdClass::class, ['item1', 'item2']],
+            [\stdClass::class, ['key' => 'value']],
+            [\stdClass::class, 1],
+            [\stdClass::class, 1.0],
+            [\stdClass::class, 0],
+            [\stdClass::class, 0.0],
+            [\stdClass::class, -5],
+            [\stdClass::class, -5.0],
+            [\stdClass::class, true],
+            [\stdClass::class, false],
+            [\stdClass::class, 'text'],
         ];
     }
 }
