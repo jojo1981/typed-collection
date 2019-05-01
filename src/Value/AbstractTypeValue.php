@@ -53,14 +53,6 @@ abstract class AbstractTypeValue implements TypeValueInterface
         return $this->getValue();
     }
 
-    /**
-     * @param string $value
-     * @return string
-     */
-    protected function mapValue(string $value): string
-    {
-        return $value;
-    }
 
     /**
      * @param string $value
@@ -73,6 +65,12 @@ abstract class AbstractTypeValue implements TypeValueInterface
             throw new ValueException($this->getExceptionMessage($value));
         }
     }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    abstract protected function mapValue(string $value): string;
 
     /**
      * @param string $value
