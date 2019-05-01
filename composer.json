@@ -26,7 +26,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Jojo1981\\TypedCollection\\": "src/"
+      "Jojo1981\\TypedCollection\\": "src/",
+      "tests\\Jojo1981\\TypedCollection\\": "tests/"
     }
   },
   "config": {
