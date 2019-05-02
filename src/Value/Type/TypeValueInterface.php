@@ -7,12 +7,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\Value;
+namespace Jojo1981\TypedCollection\Value\Type;
 
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 
 /**
- * @package Jojo1981\TypedCollection\Value
+ * @package Jojo1981\TypedCollection\Value\Type
  */
 interface TypeValueInterface
 {

@@ -7,11 +7,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace tests\Jojo1981\TypedCollection\Value;
+namespace tests\Jojo1981\TypedCollection\Value\Type;
 
-use Jojo1981\TypedCollection\Value\ClassNameTypeValue;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
-use Jojo1981\TypedCollection\Value\PrimitiveTypeValue;
+use Jojo1981\TypedCollection\Value\Type\ClassNameTypeValue;
+use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -20,7 +20,7 @@ use tests\Jojo1981\TypedCollection\Entity\TestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntityBase;
 
 /**
- * @package tests\Jojo1981\TypedCollection\Value
+ * @package tests\Jojo1981\TypedCollection\Value\Type
  */
 class ClassNameTypeValueTest extends TestCase
 {
