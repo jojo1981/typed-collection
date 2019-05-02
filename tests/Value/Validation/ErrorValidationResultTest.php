@@ -20,7 +20,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  */
 class ErrorValidationResultTest extends TestCase
 {
-    /***
+    /**
      * @test
      *
      * @throws ValueException
