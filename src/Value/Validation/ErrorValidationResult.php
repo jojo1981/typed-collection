@@ -9,6 +9,8 @@
  */
 namespace Jojo1981\TypedCollection\Value\Validation;
 
+use Jojo1981\TypedCollection\Value\Exception\ValueException;
+
 /**
  * @package Jojo1981\TypedCollection\Value\Validation
  */
@@ -19,9 +21,13 @@ class ErrorValidationResult implements ValidationResultInterface
 
     /**
      * @param string $message
+     * @throws ValueException
      */
     public function __construct(string $message)
     {
+        if (empty($message)) {
+            throw new ValueException('Message can not be empty for an error result value object');
+        }
         $this->message = $message;
     }
 
@@ -34,9 +40,9 @@ class ErrorValidationResult implements ValidationResultInterface
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getMessage(): ?string
+    public function getMessage(): string
     {
         return $this->message;
     }
