@@ -18,25 +18,6 @@ class CollectionException extends \DomainException
      * @param string $type
      * @return CollectionException
      */
-    public static function elementIsNotInstanceOf(string $type): CollectionException
-    {
-        return new self('Element should be instance of ' . $type);
-    }
-
-    /**
-     * @param string $expectedType
-     * @param string $actualType
-     * @return CollectionException
-     */
-    public static function elementIsNotOfType(string $expectedType, string $actualType): CollectionException
-    {
-        return new self('Element is not of type `' . $expectedType . '` but of type: `' . $actualType . '`');
-    }
-
-    /**
-     * @param string $type
-     * @return CollectionException
-     */
     public static function typeIsNotValid(string $type): CollectionException
     {
         return new self('Given type: `' . $type . '` is not a valid primitive type and also not an existing class');

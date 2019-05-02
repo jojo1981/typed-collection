@@ -26,34 +26,6 @@ class CollectionExceptionTest extends TestCase
      * @throws ExpectationFailedException
      * @return void
      */
-    public function elementIsNotInstanceOfShouldReturnCollectionException(): void
-    {
-        $exception = CollectionException::elementIsNotInstanceOf(\stdClass::class);
-
-        $this->assertEquals('Element should be instance of stdClass', $exception->getMessage());
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     * @return void
-     */
-    public function elementIsNotOfTypeShouldReturnCollectionException(): void
-    {
-        $exception = CollectionException::elementIsNotOfType('string', 'integer');
-
-        $this->assertEquals('Element is not of type `string` but of type: `integer`', $exception->getMessage());
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     * @return void
-     */
     public function typeIsNotValidShouldReturnCollectionException(): void
     {
         $exception = CollectionException::typeIsNotValid('invalidType');
