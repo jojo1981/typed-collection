@@ -50,6 +50,16 @@ final class TypeChecker
     }
 
     /**
+     * @param string $classNameToCheckAgainst
+     * @param string $classToCheck
+     * @return bool
+     */
+    public static function isInstanceOf(string $classNameToCheckAgainst, string $classToCheck): bool
+    {
+        return \is_a($classToCheck, $classNameToCheckAgainst, true);
+    }
+
+    /**
      * @param mixed $data
      * @return bool
      */

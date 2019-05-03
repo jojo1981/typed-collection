@@ -97,6 +97,49 @@ class TypeCheckerTest extends TestCase
     }
 
     /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function isInstanceOfShouldReturnTrue(): void
+    {
+        $this->assertTrue(TypeChecker::isInstanceOf(InterfaceTestEntity::class, InterfaceTestEntity::class));
+        $this->assertTrue(TypeChecker::isInstanceOf(InterfaceTestEntity::class, AbstractTestEntity::class));
+        $this->assertTrue(TypeChecker::isInstanceOf(InterfaceTestEntity::class, TestEntityBase::class));
+        $this->assertTrue(TypeChecker::isInstanceOf(InterfaceTestEntity::class, TestEntity::class));
+
+        $this->assertTrue(TypeChecker::isInstanceOf(AbstractTestEntity::class, AbstractTestEntity::class));
+        $this->assertTrue(TypeChecker::isInstanceOf(AbstractTestEntity::class, TestEntityBase::class));
+        $this->assertTrue(TypeChecker::isInstanceOf(AbstractTestEntity::class, TestEntity::class));
+
+        $this->assertTrue(TypeChecker::isInstanceOf(TestEntityBase::class, TestEntityBase::class));
+        $this->assertTrue(TypeChecker::isInstanceOf(TestEntityBase::class, TestEntity::class));
+
+        $this->assertTrue(TypeChecker::isInstanceOf(TestEntity::class, TestEntity::class));
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function isInstanceOfShouldReturnFalse(): void
+    {
+        $this->assertFalse(TypeChecker::isInstanceOf(TestEntity::class, TestEntityBase::class));
+        $this->assertFalse(TypeChecker::isInstanceOf(TestEntity::class, AbstractTestEntity::class));
+        $this->assertFalse(TypeChecker::isInstanceOf(TestEntity::class, InterfaceTestEntity::class));
+
+        $this->assertFalse(TypeChecker::isInstanceOf(TestEntityBase::class, AbstractTestEntity::class));
+        $this->assertFalse(TypeChecker::isInstanceOf(TestEntityBase::class, InterfaceTestEntity::class));
+
+        $this->assertFalse(TypeChecker::isInstanceOf(AbstractTestEntity::class, InterfaceTestEntity::class));
+    }
+
+    /**
      * @return array[]
      */
     public function getDataWithCorrectExpectedType(): array
