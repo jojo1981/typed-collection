@@ -60,6 +60,16 @@ final class TypeChecker
     }
 
     /**
+     * @param object $object1
+     * @param object $object2
+     * @return bool
+     */
+    public static function isExactlyTheSameClassType($object1, $object2): bool
+    {
+        return \get_class($object1) === \get_class($object2);
+    }
+
+    /**
      * @param mixed $data
      * @return bool
      */

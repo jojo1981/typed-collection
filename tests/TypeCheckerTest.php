@@ -140,6 +140,32 @@ class TypeCheckerTest extends TestCase
     }
 
     /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function isExactlyTheSameClassTypeShouldReturnTrue(): void
+    {
+        $this->assertTrue(TypeChecker::isExactlyTheSameClassType(new TestEntity(), new TestEntity()));
+        $this->assertTrue(TypeChecker::isExactlyTheSameClassType(new TestEntityBase(), new TestEntityBase()));
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function isExactlyTheSameClassTypeShouldReturnFalse(): void
+    {
+        $this->assertFalse(TypeChecker::isExactlyTheSameClassType(new TestEntity(), new TestEntityBase()));
+        $this->assertFalse(TypeChecker::isExactlyTheSameClassType(new TestEntityBase(), new TestEntity()));
+    }
+
+    /**
      * @return array[]
      */
     public function getDataWithCorrectExpectedType(): array
