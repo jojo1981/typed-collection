@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-
 namespace tests\Jojo1981\TypedCollection\Metadata;
 
 use Jojo1981\TypedCollection\Metadata\TypeMetadata;
@@ -27,9 +26,9 @@ class TypeMetadataTest extends TestCase
      * @dataProvider getClassTypeTestData
      *
      * @param mixed $data
-     * @return void
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function isPrimitiveTypeShouldReturnFalse($data): void
     {
@@ -84,9 +83,9 @@ class TypeMetadataTest extends TestCase
      *
      * @param mixed $data
      * @param string $expectedType
-     * @return void
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function getTypeShouldReturnTheCorrectType($data, string $expectedType): void
     {
@@ -99,43 +98,13 @@ class TypeMetadataTest extends TestCase
      *
      * @param mixed $data
      * @param string $expectedType
-     * @return void
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function toStringShouldReturnTheCorrectStringPresentation($data, string $expectedType): void
     {
-        $this->assertEquals($expectedType, (string)(new TypeMetadata($data)));
-    }
-
-    /**
-     * @test
-     * @dataProvider getValidDataForMatchType
-     *
-     * @param mixed $data
-     * @param string $typeToTest
-     * @return void
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     */
-    public function matchTypeShouldReturnTrueWhenTypeMatches($data, string $typeToTest): void
-    {
-        $this->assertTrue((new TypeMetadata($data))->matchType($typeToTest));
-    }
-
-    /**
-     * @test
-     * @dataProvider getInvalidDataForMatchType
-     *
-     * @param mixed $data
-     * @param string $typeToTest
-     * @return void
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     */
-    public function matchTypeShouldReturnTFalseWhenTypeNotMatches($data, string $typeToTest): void
-    {
-        $this->assertFalse((new TypeMetadata($data))->matchType($typeToTest));
+        $this->assertEquals($expectedType, (string) new TypeMetadata($data));
     }
 
     /**
@@ -181,69 +150,5 @@ class TypeMetadataTest extends TestCase
     public function getAllValidTestData(): array
     {
         return \array_merge($this->getPrimitiveTestData(), $this->getClassTypeTestData());
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getValidDataForMatchType(): array
-    {
-        return \array_merge(
-            $this->getAllValidTestData(),
-            [
-                [new \stdClass(), 'object'],
-                [new TestEntity(), 'object'],
-                [new TestEntityBase(), 'object'],
-                [new \stdClass(), \stdClass::class],
-                [new \stdClass(), '\stdClass'],
-                [new TestEntity(), TestEntity::class],
-                [new TestEntityBase(), TestEntityBase::class],
-                [new TestEntityBase(), TestEntity::class], // inheritance
-            ]
-        );
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getInvalidDataForMatchType(): array
-    {
-        $result = [];
-        foreach ($this->getPrimitiveTestData() as [$data, $matchingType]) {
-            foreach ($this->getAllTypesExcept($matchingType) as $notMatchingType) {
-                $result[] = [$data, $notMatchingType];
-            }
-        }
-
-        $result[] = [new TestEntity(), TestEntityBase::class]; // does not inherit
-        $result[] = [new TestEntityBase(), \stdClass::class];
-
-        return $result;
-    }
-
-    /**
-     * @param string $excludedType
-     * @return string[]
-     */
-    private function getAllTypesExcept(string $excludedType): array
-    {
-        $types = [
-            'integer',
-            'float',
-            'boolean',
-            'string',
-            'array',
-            'object',
-            \stdClass::class,
-            TestEntity::class,
-            TestEntityBase::class
-        ];
-
-        return \array_filter(
-            $types,
-            static function (string $type) use ($excludedType): bool {
-                return $type !== $excludedType;
-            }
-        );
     }
 }

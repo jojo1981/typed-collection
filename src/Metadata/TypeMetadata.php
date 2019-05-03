@@ -35,7 +35,7 @@ final class TypeMetadata
             $this->type = $className;
         } else {
             $this->isPrimitiveType = true;
-            $this->type = $this->mapPrimitiveType(\gettype($data));
+            $this->type = static::normalizePrimitiveType(\gettype($data));
         }
     }
 
@@ -64,23 +64,6 @@ final class TypeMetadata
     }
 
     /**
-     * @param string $type
-     * @return bool
-     */
-    public function matchType(string $type): bool
-    {
-        if ('object' === \strtolower($type)) {
-            return false === $this->isPrimitiveType;
-        }
-
-        if (false === $this->isPrimitiveType) {
-            return \is_a($type, $this->type, true);
-        }
-
-        return \strtolower($type) === $this->type;
-    }
-
-    /**
      * @return string
      */
     public function __toString(): string
@@ -92,7 +75,7 @@ final class TypeMetadata
      * @param string $type
      * @return string
      */
-    private function mapPrimitiveType(string $type): string
+    private static function normalizePrimitiveType(string $type): string
     {
         $type = \strtolower($type);
         if (\array_key_exists($type, static::TYPE_MAP)) {
