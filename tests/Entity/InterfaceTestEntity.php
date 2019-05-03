@@ -12,6 +12,7 @@ namespace tests\Jojo1981\TypedCollection\Entity;
 /**
  * @package tests\Jojo1981\TypedCollection\Entity
  */
-abstract class AbstractTestEntity implements InterfaceTestEntity
+interface InterfaceTestEntity
 {
+
 }

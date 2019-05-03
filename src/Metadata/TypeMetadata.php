@@ -19,6 +19,9 @@ final class TypeMetadata
         'double' => 'float'
     ];
 
+    /** @var mixed */
+    private $data;
+
     /** @var bool */
     private $isPrimitiveType;
 
@@ -30,6 +33,7 @@ final class TypeMetadata
      */
     public function __construct($data)
     {
+        $this->data = $data;
         if (\is_object($data) && false !== $className = \get_class($data)) {
             $this->isPrimitiveType = false;
             $this->type = $className;
@@ -61,6 +65,23 @@ final class TypeMetadata
     public function getType(): string
     {
         return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return bool
+     */
+    public function matchType(string $type): bool
+    {
+        if ('object' === \strtolower($type)) {
+            return false === $this->isPrimitiveType;
+        }
+
+        if (false === $this->isPrimitiveType) {
+            return $this->data instanceof $type;
+        }
+
+        return \strtolower($type) === $this->type;
     }
 
     /**
