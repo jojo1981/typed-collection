@@ -24,6 +24,8 @@ final class TypeChecker
 
     /**
      * Private constructor to prevent getting an instance of this class
+     *
+     * @codeCoverageIgnore
      */
     private function __construct()
     {
@@ -41,8 +43,8 @@ final class TypeChecker
             return $data instanceof $expectedType;
         }
 
-        $expectedType = static::mapPrimitiveType($expectedType);
-        $actualType = static::mapPrimitiveType(\gettype($data));
+        $expectedType = static::normalizePrimitiveType($expectedType);
+        $actualType = static::normalizePrimitiveType(\gettype($data));
 
         return $actualType === $expectedType;
     }
@@ -51,7 +53,7 @@ final class TypeChecker
      * @param string $type
      * @return string
      */
-    private static function mapPrimitiveType(string $type): string
+    private static function normalizePrimitiveType(string $type): string
     {
         $type = \strtolower($type);
         if (\array_key_exists($type, static::TYPE_MAP)) {
