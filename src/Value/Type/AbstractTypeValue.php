@@ -9,7 +9,6 @@
  */
 namespace Jojo1981\TypedCollection\Value\Type;
 
-use Jojo1981\TypedCollection\Metadata\TypeMetadata;
 use Jojo1981\TypedCollection\TypeChecker;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
@@ -70,14 +69,12 @@ abstract class AbstractTypeValue implements TypeValueInterface
             return new SuccessValidationResult();
         }
 
-        $typeMetadata = new TypeMetadata($data);
-
         return new ErrorValidationResult(\sprintf(
             'Data is not %s: `%s`, but %s: `%s`',
             $this instanceof ClassNameTypeValue ? 'an instance of' : 'of expected type',
             $this->getValue(),
-            $typeMetadata->isClassType() ? 'an instance of' : 'of type',
-            $typeMetadata->getType()
+            TypeChecker::isClassType($data) ? 'an instance of' : 'of type',
+            TypeChecker::getType($data)
         ));
     }
 

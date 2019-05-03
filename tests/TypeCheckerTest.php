@@ -54,6 +54,49 @@ class TypeCheckerTest extends TestCase
     }
 
     /**
+     * @test
+     * @dataProvider getAllValidTestData
+     *
+     * @param mixed $data
+     * @param string $expectedType
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @return void
+     */
+    public function getTypeShouldReturnTheCorrectType($data, string $expectedType): void
+    {
+        $this->assertEquals($expectedType, TypeChecker::getType($data));
+    }
+
+    /**
+     * @test
+     * @dataProvider getPrimitiveTestData
+     *
+     * @param mixed $data
+     * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     */
+    public function isClassTypeShouldReturnFalse($data): void
+    {
+        $this->assertFalse(TypeChecker::isClassType($data));
+    }
+
+    /**
+     * @test
+     * @dataProvider getClassTypeTestData
+     *
+     * @param mixed $data
+     * @return void
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     */
+    public function isClassTypeShouldReturnTrue($data): void
+    {
+        $this->assertTrue(TypeChecker::isClassType($data));
+    }
+
+    /**
      * @return array[]
      */
     public function getDataWithCorrectExpectedType(): array
@@ -100,6 +143,51 @@ class TypeCheckerTest extends TestCase
             [new TestEntity(), AbstractTestEntity::class],
             [new TestEntity(), InterfaceTestEntity::class]
         ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getPrimitiveTestData(): array
+    {
+        return [
+            [null, 'null'],
+            ['text', 'string'],
+            ['', 'string'],
+            [true, 'boolean'],
+            [false, 'boolean'],
+            [-1, 'integer'],
+            [0, 'integer'],
+            [1, 'integer'],
+            [-1.0, 'float'],
+            [0.0, 'float'],
+            [1.0, 'float'],
+            [3.25, 'float'],
+            [3.25, 'float'],
+            [[], 'array'],
+            [['item1', 'item2'], 'array'],
+            [['key1' => 'value1'], 'array'],
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getClassTypeTestData(): array
+    {
+        return [
+            [new \stdClass(), \stdClass::class],
+            [new TestEntity(), TestEntity::class],
+            [new TestEntityBase(), TestEntityBase::class]
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getAllValidTestData(): array
+    {
+        return \array_merge($this->getPrimitiveTestData(), $this->getClassTypeTestData());
     }
 
     /**

@@ -50,6 +50,28 @@ final class TypeChecker
     }
 
     /**
+     * @param mixed $data
+     * @return bool
+     */
+    public static function isClassType($data): bool
+    {
+        return \is_object($data) && \get_class($data);
+    }
+
+    /**
+     * @param mixed $data
+     * @return string
+     */
+    public static function getType($data): string
+    {
+        if (\is_object($data) && false !== $className = \get_class($data)) {
+            return $className;
+        }
+
+        return static::normalizePrimitiveType(\gettype($data));
+    }
+
+    /**
      * @param string $type
      * @return string
      */
