@@ -9,7 +9,6 @@
  */
 namespace tests\Jojo1981\TypedCollection;
 
-use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\CollectionIterator;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
