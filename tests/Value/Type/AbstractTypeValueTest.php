@@ -16,6 +16,8 @@ use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use tests\Jojo1981\TypedCollection\Entity\AbstractTestEntity;
+use tests\Jojo1981\TypedCollection\Entity\InterfaceTestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntityBase;
 
@@ -26,11 +28,11 @@ class AbstractTypeValueTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider getInvalidTypes
+     * @dataProvider getInvalidTypeStrings
      *
      * @param string $value
-     * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
      * @return void
      */
     public function isValidValueShouldReturnFalseWhenValueIsNotValid(string $value): void
@@ -40,12 +42,12 @@ class AbstractTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidTypes
+     * @dataProvider getValidTypeStrings
      *
      * @param string $value
-     * @return void
-     * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @return void
      */
     public function isValidValueShouldReturnTrueWhenValueIsValid(string $value): void
     {
@@ -54,7 +56,7 @@ class AbstractTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getInvalidTypes
+     * @dataProvider getInvalidTypeStrings
      *
      * @param string $value
      * @param string $message
@@ -72,13 +74,13 @@ class AbstractTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidTypes
+     * @dataProvider getValidTypeStrings
      *
      * @param string $value
      * @param string $expectedInstanceOf
-     * @throws InvalidArgumentException
      * @throws ValueException
      * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      * @return void
      */
     public function createTypeValueInstanceShouldReturnTheCorrectValueTypeObjectInstanceBecauseGivenValueIsValid(
@@ -90,34 +92,22 @@ class AbstractTypeValueTest extends TestCase
     }
 
     /**
-     * @return array
+     * @return array[]
      */
-    public function getInvalidTypes(): array
+    public function getInvalidTypeStrings(): array
     {
         return [
-            [
-                'invalid-type-value',
-                'Could not create a type value instance instance based on value: `invalid-type-value`'
-            ],
-            [
-                TestCase::class,
-                'Could not create a type value instance instance based on value: `' . TestCase::class .'`'
-            ],
-            [
-                '\\' . TestCase::class,
-                'Could not create a type value instance instance based on value: `\\' . TestCase::class . '`'
-            ],
-            [
-                'Non\Existing\Class',
-                'Could not create a type value instance instance based on value: `Non\Existing\Class`'
-            ]
+            ['invalid-type-value', 'Could not create a type value instance based on value: `invalid-type-value`'],
+            // existing namespace but no a class or interface
+            ['tests\Jojo1981\TypedCollection', 'Could not create a type value instance based on value: `tests\Jojo1981\TypedCollection`'],
+            ['Non\Existing\Class', 'Could not create a type value instance based on value: `Non\Existing\Class`']
         ];
     }
 
     /**
      * @return array[]
      */
-    public function getValidTypes(): array
+    public function getValidTypeStrings(): array
     {
         return [
             ['int', PrimitiveTypeValue::class],
@@ -133,7 +123,9 @@ class AbstractTypeValueTest extends TestCase
             [\stdClass::class, ClassNameTypeValue::class],
             ['\stdClass', ClassNameTypeValue::class],
             [TestEntityBase::class, ClassNameTypeValue::class],
-            [TestEntity::class, ClassNameTypeValue::class]
+            [TestEntity::class, ClassNameTypeValue::class],
+            [InterfaceTestEntity::class, ClassNameTypeValue::class],
+            [AbstractTestEntity::class, ClassNameTypeValue::class]
         ];
     }
 }

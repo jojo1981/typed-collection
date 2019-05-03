@@ -75,15 +75,6 @@ final class PrimitiveTypeValue extends AbstractTypeValue
     }
 
     /**
-     * @param mixed $data
-     * @return bool
-     */
-    public function isValidData($data): bool
-    {
-        return $this->getValue() === $this->mapValue(\gettype($data));
-    }
-
-    /**
      * @param string $value
      * @return bool
      */

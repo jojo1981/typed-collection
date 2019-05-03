@@ -12,6 +12,9 @@ namespace tests\Jojo1981\TypedCollection\Value\Type;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Type\ClassNameTypeValue;
 use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
+use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
+use Jojo1981\TypedCollection\Value\Validation\SuccessValidationResult;
+use Jojo1981\TypedCollection\Value\Validation\ValidationResultInterface;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -28,9 +31,9 @@ class PrimitiveTypeValueTest extends TestCase
      * @dataProvider getInvalidValueStrings
      *
      * @param string $value
-     * @return void
-     *@throws ExpectationFailedException
+     * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function isValidValueShouldReturnFalseForInvalidValue(string $value): void
     {
@@ -43,8 +46,8 @@ class PrimitiveTypeValueTest extends TestCase
      *
      * @param string $value
      * @param string $message
+     * @throws ValueException
      * @return void
-     *@throws ValueException
      */
     public function constructWithInvalidTypeShouldThrowValueException(string $value, string $message): void
     {
@@ -57,9 +60,9 @@ class PrimitiveTypeValueTest extends TestCase
      * @dataProvider getValidValueStrings
      *
      * @param string $value
-     * @return void
-     *@throws ExpectationFailedException
+     * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function isValidValueShouldReturnTrueForValidValue(string $value): void
     {
@@ -72,10 +75,10 @@ class PrimitiveTypeValueTest extends TestCase
      *
      * @param string $value
      * @param string $mappedValue
-     * @return void
-     *@throws ValueException
+     * @throws ValueException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function constructWithValidValueShouldReturnCorrectMappedValue(string $value, string $mappedValue): void
     {
@@ -143,70 +146,23 @@ class PrimitiveTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getInvalidDataMap
+     * @dataProvider getIsValidDataTestData
      *
      * @param string $value
-     * @param $invalidDataValue
-     * @throws ValueException
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @return void
-     */
-    public function isValidDataShouldReturnFalseWhenDataIsNotConformThePrimitiveType(
-        string $value,
-        $invalidDataValue
-    ): void
-    {
-        $this->assertFalse((new PrimitiveTypeValue($value))->isValidData($invalidDataValue));
-    }
-
-    /**
-     * @test
-     * @dataProvider getValidDataMap
-     *
-     * @param string $value
-     * @param $validDataValue
+     * @param mixed $data
+     * @param ValidationResultInterface $expectValidationResult
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      * @throws ValueException
      * @return void
      */
-    public function isValidDataShouldReturnTrueWhenDataIsConformThePrimitiveType(
+    public function isValidDataShouldReturnReturnTheCorrectValidationResult(
         string $value,
-        $validDataValue
+        $data,
+        ValidationResultInterface $expectValidationResult
     ): void
     {
-        $this->assertTrue((new PrimitiveTypeValue($value))->isValidData($validDataValue));
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getInvalidDataMap(): array
-    {
-        $result = [];
-        foreach ($this->getValidTypes() as $type) {
-            foreach ($this->getInvalidDataForType($type) as $invalidDataValue) {
-                $result[] = [$type, $invalidDataValue];
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getValidDataMap(): array
-    {
-        $result = [];
-        foreach ($this->getValidTypes() as $type) {
-            foreach ($this->getValidDataForType($type) as $validDataValue) {
-                $result[] = [$type, $validDataValue];
-            }
-        }
-
-        return $result;
+        $this->assertEquals($expectValidationResult, (new PrimitiveTypeValue($value))->isValidData($data));
     }
 
     /**
@@ -243,96 +199,222 @@ class PrimitiveTypeValueTest extends TestCase
      */
     public function getInvalidValueStrings(): array
     {
-        $suffix = ' Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]';
-
         return [
-            [
-                'invalid-type-value',
-                'Invalid type: `invalid-type-value` given.' . $suffix
-            ],
-            [
-                TestEntity::class,
-                'Invalid type: `' . TestEntity::class . '` given.' . $suffix
-            ],
-            [
-                \stdClass::class,
-                'Invalid type: `' . \stdClass::class . '` given.' . $suffix
-            ]
+            ['invalid-type-value', 'Invalid type: `invalid-type-value` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]'],
+            [TestEntity::class, 'Invalid type: `tests\Jojo1981\TypedCollection\Entity\TestEntity` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]'],
+            [\stdClass::class, 'Invalid type: `stdClass` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]']
         ];
     }
 
     /**
-     * @return array
+     * @throws ValueException
+     * @return array[]
      */
-    private function getValidTypes(): array
+    public function getIsValidDataTestData(): array
     {
         return [
-            'int',
-            'integer',
-            'float',
-            'double',
-            'number',
-            'bool',
-            'boolean',
-            'string',
-            'array',
-            'object'
+
+            // Successes
+
+            ['integer', -1, new SuccessValidationResult()],
+            ['integer', 0, new SuccessValidationResult()],
+            ['integer', 1, new SuccessValidationResult()],
+            ['integer', 10, new SuccessValidationResult()],
+            ['integer', -10, new SuccessValidationResult()],
+
+            ['int', -1, new SuccessValidationResult()],
+            ['int', 0, new SuccessValidationResult()],
+            ['int', 1, new SuccessValidationResult()],
+            ['int', 10, new SuccessValidationResult()],
+            ['int', -10, new SuccessValidationResult()],
+
+            ['float', -1.0, new SuccessValidationResult()],
+            ['float', 0.0, new SuccessValidationResult()],
+            ['float', 1.0, new SuccessValidationResult()],
+            ['float', 10.0, new SuccessValidationResult()],
+            ['float', -10.0, new SuccessValidationResult()],
+
+            ['double', -1.0, new SuccessValidationResult()],
+            ['double', 0.0, new SuccessValidationResult()],
+            ['double', 1.0, new SuccessValidationResult()],
+            ['double', 10.0, new SuccessValidationResult()],
+            ['double', -10.0, new SuccessValidationResult()],
+
+            ['number', -1.0, new SuccessValidationResult()],
+            ['number', 0.0, new SuccessValidationResult()],
+            ['number', 1.0, new SuccessValidationResult()],
+            ['number', 10.0, new SuccessValidationResult()],
+            ['number', -10.0, new SuccessValidationResult()],
+
+            ['boolean', true, new SuccessValidationResult()],
+            ['boolean', false, new SuccessValidationResult()],
+
+            ['bool', true, new SuccessValidationResult()],
+            ['bool', false, new SuccessValidationResult()],
+
+            ['string', 'text1', new SuccessValidationResult()],
+            ['string', 'text2', new SuccessValidationResult()],
+            ['string', 'text3', new SuccessValidationResult()],
+            ['string', TestEntity::class, new SuccessValidationResult()],
+
+            ['array', [], new SuccessValidationResult()],
+            ['array', ['item1', 'item2'], new SuccessValidationResult()],
+            ['array', ['key' => 'value'], new SuccessValidationResult()],
+
+            ['object', new \stdClass(), new SuccessValidationResult()],
+            ['object', new TestEntity(), new SuccessValidationResult()],
+            ['object', new TestEntityBase(), new SuccessValidationResult()],
+
+            // Errors
+
+            ['integer', 3.47, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['integer', -5.23, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['integer', 5.0, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['integer', -5.0, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['integer', 'text', new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `string`')],
+            ['integer', true, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `boolean`')],
+            ['integer', false, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `boolean`')],
+            ['integer', [], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
+            ['integer', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
+            ['integer', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
+            ['integer', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `stdClass`')],
+            ['integer', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['integer', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['int', 3.47, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['int', -5.23, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['int', 5.0, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['int', -5.0, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
+            ['int', 'text', new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `string`')],
+            ['int', true, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `boolean`')],
+            ['int', false, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `boolean`')],
+            ['int', [], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
+            ['int', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
+            ['int', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
+            ['int', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `stdClass`')],
+            ['int', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['int', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['float', 0, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['float', 1, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['float', 10, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['float', -3, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['float', 'text', new ErrorValidationResult('Data is not of expected type: `float`, but of type: `string`')],
+            ['float', true, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `boolean`')],
+            ['float', false, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `boolean`')],
+            ['float', [], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['float', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['float', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['float', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `stdClass`')],
+            ['float', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['float', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['double', 0, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['double', 1, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['double', 10, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['double', -3, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['double', 'text', new ErrorValidationResult('Data is not of expected type: `float`, but of type: `string`')],
+            ['double', true, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `boolean`')],
+            ['double', false, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `boolean`')],
+            ['double', [], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['double', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['double', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['double', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `stdClass`')],
+            ['double', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['double', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['number', 0, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['number', 1, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['number', 10, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['number', -3, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
+            ['number', 'text', new ErrorValidationResult('Data is not of expected type: `float`, but of type: `string`')],
+            ['number', true, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `boolean`')],
+            ['number', false, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `boolean`')],
+            ['number', [], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['number', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['number', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
+            ['number', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `stdClass`')],
+            ['number', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['number', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['boolean', 0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['boolean', 1, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['boolean', 10, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['boolean', -3, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['boolean', 3.47, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['boolean', -5.23, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['boolean', 5.0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['boolean', -5.0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['boolean', 'text', new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `string`')],
+            ['boolean', [], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
+            ['boolean', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
+            ['boolean', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
+            ['boolean', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `stdClass`')],
+            ['boolean', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['boolean', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['bool', 0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['bool', 1, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['bool', 10, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['bool', -3, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
+            ['bool', 3.47, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['bool', -5.23, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['bool', 5.0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['bool', -5.0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `float`')],
+            ['bool', 'text', new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `string`')],
+            ['bool', [], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
+            ['bool', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
+            ['bool', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
+            ['bool', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `stdClass`')],
+            ['bool', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['bool', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['string', 0, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `integer`')],
+            ['string', 1, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `integer`')],
+            ['string', 10, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `integer`')],
+            ['string', -3, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `integer`')],
+            ['string', 3.47, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `float`')],
+            ['string', -5.23, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `float`')],
+            ['string', 5.0, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `float`')],
+            ['string', -5.0, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `float`')],
+            ['string', true, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `boolean`')],
+            ['string', false, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `boolean`')],
+            ['string', [], new ErrorValidationResult('Data is not of expected type: `string`, but of type: `array`')],
+            ['string', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `string`, but of type: `array`')],
+            ['string', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `string`, but of type: `array`')],
+            ['string', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `stdClass`')],
+            ['string', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['string', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['array', 0, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `integer`')],
+            ['array', 1, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `integer`')],
+            ['array', 10, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `integer`')],
+            ['array', -3, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `integer`')],
+            ['array', 3.47, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `float`')],
+            ['array', -5.23, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `float`')],
+            ['array', 5.0, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `float`')],
+            ['array', -5.0, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `float`')],
+            ['array', 'text', new ErrorValidationResult('Data is not of expected type: `array`, but of type: `string`')],
+            ['array', true, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `boolean`')],
+            ['array', false, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `boolean`')],
+            ['array', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `stdClass`')],
+            ['array', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`')],
+            ['array', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+
+            ['object', 0, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `integer`')],
+            ['object', 1, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `integer`')],
+            ['object', 10, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `integer`')],
+            ['object', -3, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `integer`')],
+            ['object', 3.47, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `float`')],
+            ['object', -5.23, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `float`')],
+            ['object', 5.0, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `float`')],
+            ['object', -5.0, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `float`')],
+            ['object', 'text', new ErrorValidationResult('Data is not of expected type: `object`, but of type: `string`')],
+            ['object', true, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `boolean`')],
+            ['object', false, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `boolean`')],
+            ['object', [], new ErrorValidationResult('Data is not of expected type: `object`, but of type: `array`')],
+            ['object', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `object`, but of type: `array`')],
+            ['object', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `object`, but of type: `array`')]
         ];
-    }
-
-    /**
-     * @param string $type
-     * @return array
-     */
-    private function getValidDataForType(string $type): array
-    {
-        $data = [
-            'integer' => [0, 1, 10, -1, -10],
-            'float' => [0.0, -1.0, 1.0, 2.75, -5.5],
-            'boolean' => [true, false],
-            'string' => ['text1', 'text2', 'text3', TestEntity::class],
-            'array' => [[], ['item1', 'item2'], ['key' =>' value']],
-            'object' => [new \stdClass(), new TestEntity(), new TestEntityBase()],
-        ];
-
-        return $data[$this->mapType($type)];
-    }
-
-    /**
-     * @param string $type
-     * @return array
-     */
-    private function getInvalidDataForType(string $type): array
-    {
-        $data = [
-            'integer' => [3.47, -5.23, 5.0, -5.0, 'text', true, false, [], ['item1', 'item2'], ['key' =>' value'], new \stdClass(), new TestEntity()],
-            'float' => [0, 1, 10, -3, 'text', true, false, [], ['item1', 'item2'], ['key' =>' value'], new \stdClass(), new TestEntity()],
-            'boolean' => [0, 1, 10, 3.47, -3, -5.23, 5.0, -5.0, 'text', [], ['item1', 'item2'], ['key' =>' value'], new \stdClass(), new TestEntity()],
-            'string' => [0, 1, 10, 3.47, -3, -5.23, 5.0, -5.0, true, false, [], ['item1', 'item2'], ['key' =>' value'], new \stdClass(), new TestEntity()],
-            'array' => [0, 1, 10, 3.47, -3, -5.23, 5.0, -5.0, 'text', true, false, new \stdClass(), new TestEntity()],
-            'object' => [0, 1, 10, 3.47, -3, -5.23, 5.0, -5.0, 'text', true, false, [], ['item1', 'item2'], ['key' =>' value']],
-        ];
-
-        return $data[$this->mapType($type)];
-    }
-
-    /**
-     * @param string $type
-     * @return string
-     */
-    private function mapType(string $type): string
-    {
-        $map = [
-            'int' => 'integer',
-            'double' => 'float',
-            'number' => 'float',
-            'bool' => 'boolean'
-        ];
-
-        if (\array_key_exists($type, $map)) {
-            return $map[$type];
-        }
-
-        return $type;
     }
 }

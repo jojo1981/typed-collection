@@ -12,10 +12,14 @@ namespace tests\Jojo1981\TypedCollection\Value\Type;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Type\ClassNameTypeValue;
 use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
+use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
+use Jojo1981\TypedCollection\Value\Validation\SuccessValidationResult;
+use Jojo1981\TypedCollection\Value\Validation\ValidationResultInterface;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use tests\Jojo1981\TypedCollection\Entity\AbstractTestEntity;
+use tests\Jojo1981\TypedCollection\Entity\InterfaceTestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntityBase;
 
@@ -29,9 +33,9 @@ class ClassNameTypeValueTest extends TestCase
      * @dataProvider getInvalidValueStrings
      *
      * @param string $value
-     * @return void
-     *@throws ExpectationFailedException
+     * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function isValidValueShouldReturnFalseForInvalidValue(string $value): void
     {
@@ -44,8 +48,8 @@ class ClassNameTypeValueTest extends TestCase
      *
      * @param string $value
      * @param string $message
+     * @throws ValueException
      * @return void
-     *@throws ValueException
      */
     public function constructWithInvalidTypeShouldThrowValueException(string $value, string $message): void
     {
@@ -58,9 +62,9 @@ class ClassNameTypeValueTest extends TestCase
      * @dataProvider getValidValueStrings
      *
      * @param string $value
-     * @return void
-     *@throws ExpectationFailedException
+     * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function isValidValueShouldReturnTrueForValidValue(string $value): void
     {
@@ -73,10 +77,10 @@ class ClassNameTypeValueTest extends TestCase
      *
      * @param string $value
      * @param string $mappedValue
-     * @return void
-     *@throws ValueException
+     * @throws ValueException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @return void
      */
     public function constructWithValidValueShouldReturnCorrectMappedValue(string $value, string $mappedValue): void
     {
@@ -129,40 +133,23 @@ class ClassNameTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getInvalidDataMap
+     * @dataProvider getIsValidDataTestData
      *
      * @param string $value
      * @param mixed $invalidData
-     * @throws InvalidArgumentException
+     * @param ValidationResultInterface $expectValidationResult
      * @throws ValueException
      * @throws ExpectationFailedException
-     * @return void
-     */
-    public function isValidDataShouldReturnFalseWhenDataIsNotConformTheClassNameType(
-        string $value,
-        $invalidData
-    ): void
-    {
-        $this->assertFalse((new ClassNameTypeValue($value))->isValidData($invalidData));
-    }
-
-    /**
-     * @test
-     * @dataProvider getValidDataMap
-     *
-     * @param string $value
-     * @param mixed $validData
      * @throws InvalidArgumentException
-     * @throws ValueException
-     * @throws ExpectationFailedException
      * @return void
      */
-    public function isValidDataShouldReturnTrueWhenDataIsConformTheClassNameType(
+    public function isValidDataShouldReturnReturnTheCorrectValidationResult(
         string $value,
-        $validData
+        $invalidData,
+        ValidationResultInterface $expectValidationResult
     ): void
     {
-        $this->assertTrue((new ClassNameTypeValue($value))->isValidData($validData));
+        $this->assertEquals($expectValidationResult, (new ClassNameTypeValue($value))->isValidData($invalidData));
     }
 
     /**
@@ -172,33 +159,18 @@ class ClassNameTypeValueTest extends TestCase
     {
         return [
             ['', 'Value can not be empty'],
-            ['in-valid-type', 'Invalid class name: `in-valid-type`'],
-            ['int', 'Invalid class name: `int`'],
-            ['integer', 'Invalid class name: `integer`'],
-            ['float', 'Invalid class name: `float`'],
-            ['double', 'Invalid class name: `double`'],
-            ['number', 'Invalid class name: `number`'],
-            ['bool', 'Invalid class name: `bool`'],
-            ['boolean', 'Invalid class name: `boolean`'],
-            ['string', 'Invalid class name: `string`'],
-            ['array', 'Invalid class name: `array`'],
-            ['object', 'Invalid class name: `object`'],
-            [
-                'tests\Jojo1981\TypedCollection\Value',
-                'Invalid class name: `tests\Jojo1981\TypedCollection\Value`'
-            ],
-            [
-                '\tests\Jojo1981\TypedCollection\Value',
-                'Invalid class name: `\tests\Jojo1981\TypedCollection\Value`'
-            ],
-            [
-                AbstractTestEntity::class,
-                'Invalid existing class name: `' . AbstractTestEntity::class. '` it is not instantiable'
-            ],
-            [
-                '\\' . AbstractTestEntity::class,
-                'Invalid existing class name: `\\' . AbstractTestEntity::class. '` it is not instantiable'
-            ]
+            ['in-valid-type', 'Invalid class name: `in-valid-type`. Value must be an existing class or interface.'],
+            ['int', 'Invalid class name: `int`. Value must be an existing class or interface.'],
+            ['integer', 'Invalid class name: `integer`. Value must be an existing class or interface.'],
+            ['float', 'Invalid class name: `float`. Value must be an existing class or interface.'],
+            ['double', 'Invalid class name: `double`. Value must be an existing class or interface.'],
+            ['number', 'Invalid class name: `number`. Value must be an existing class or interface.'],
+            ['bool', 'Invalid class name: `bool`. Value must be an existing class or interface.'],
+            ['boolean', 'Invalid class name: `boolean`. Value must be an existing class or interface.'],
+            ['string', 'Invalid class name: `string`. Value must be an existing class or interface.'],
+            ['array', 'Invalid class name: `array`. Value must be an existing class or interface.'],
+            ['object', 'Invalid class name: `object`. Value must be an existing class or interface.'],
+            ['tests\Jojo1981\TypedCollection', 'Invalid class name: `tests\Jojo1981\TypedCollection`. Value must be an existing class or interface.']
         ];
     }
 
@@ -210,49 +182,35 @@ class ClassNameTypeValueTest extends TestCase
         return [
             [__CLASS__, __CLASS__],
             [ClassNameTypeValue::class, ClassNameTypeValue::class],
-            ['\\' . ClassNameTypeValue::class, ClassNameTypeValue::class]
-        ];
-    }
-
-
-    /**
-     * @return array[]
-     */
-    public function getValidDataMap(): array
-    {
-        return [
-            [TestEntity::class, new TestEntity()],
-            ['\\' . TestEntity::class, new TestEntity()],
-            [TestEntityBase::class, new TestEntityBase()],
-            ['\\' . TestEntityBase::class, new TestEntityBase()],
-            [\stdClass::class, new \stdClass()]
+            ['\\' . ClassNameTypeValue::class, ClassNameTypeValue::class],
+            [AbstractTestEntity::class, AbstractTestEntity::class],
+            [InterfaceTestEntity::class, InterfaceTestEntity::class]
         ];
     }
 
     /**
+     * @throws ValueException
      * @return array[]
      */
-    public function getInvalidDataMap(): array
+    public function getIsValidDataTestData(): array
     {
         return [
-            [TestEntity::class, new TestEntityBase()],
-            [TestEntity::class, new \stdClass()],
-            [TestEntityBase::class, new TestEntity()],
-            [TestEntityBase::class, new \stdClass()],
-            [\stdClass::class, new TestEntityBase()],
-            [\stdClass::class, new TestEntity()],
-            [\stdClass::class, []],
-            [\stdClass::class, ['item1', 'item2']],
-            [\stdClass::class, ['key' => 'value']],
-            [\stdClass::class, 1],
-            [\stdClass::class, 1.0],
-            [\stdClass::class, 0],
-            [\stdClass::class, 0.0],
-            [\stdClass::class, -5],
-            [\stdClass::class, -5.0],
-            [\stdClass::class, true],
-            [\stdClass::class, false],
-            [\stdClass::class, 'text'],
+            [TestEntityBase::class, new TestEntity(), new SuccessValidationResult()],
+            [TestEntity::class, new TestEntity(), new SuccessValidationResult()],
+            ['\\' . TestEntity::class, new TestEntity(), new SuccessValidationResult()],
+            [TestEntityBase::class, new TestEntityBase(), new SuccessValidationResult()],
+            ['\\' . TestEntityBase::class, new TestEntityBase(), new SuccessValidationResult()],
+            [\stdClass::class, new \stdClass(), new SuccessValidationResult()],
+            [TestEntity::class, new TestEntityBase(), new ErrorValidationResult('Data is not an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+            [TestEntity::class, new \stdClass(), new ErrorValidationResult('Data is not an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`, but an instance of: `stdClass`')],
+            [TestEntityBase::class, new \stdClass(), new ErrorValidationResult('Data is not an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`, but an instance of: `stdClass`')],
+            [\stdClass::class, new TestEntityBase(), new ErrorValidationResult('Data is not an instance of: `stdClass`, but an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntityBase`')],
+            [\stdClass::class, [], new ErrorValidationResult('Data is not an instance of: `stdClass`, but of type: `array`')],
+            [\stdClass::class, 'text', new ErrorValidationResult('Data is not an instance of: `stdClass`, but of type: `string`')],
+            [\stdClass::class, -10, new ErrorValidationResult('Data is not an instance of: `stdClass`, but of type: `integer`')],
+            [\stdClass::class, false, new ErrorValidationResult('Data is not an instance of: `stdClass`, but of type: `boolean`')],
+            [\stdClass::class, true, new ErrorValidationResult('Data is not an instance of: `stdClass`, but of type: `boolean`')],
+            [TestEntity::class, 0.0, new ErrorValidationResult('Data is not an instance of: `tests\Jojo1981\TypedCollection\Entity\TestEntity`, but of type: `float`')]
         ];
     }
 }

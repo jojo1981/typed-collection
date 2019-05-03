@@ -10,6 +10,7 @@
 namespace Jojo1981\TypedCollection\Value\Type;
 
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
+use Jojo1981\TypedCollection\Value\Validation\ValidationResultInterface;
 
 /**
  * @package Jojo1981\TypedCollection\Value\Type
@@ -40,9 +41,9 @@ interface TypeValueInterface
 
     /**
      * @param mixed $data
-     * @return bool
+     * @return ValidationResultInterface
      */
-    public function isValidData($data): bool;
+    public function isValidData($data): ValidationResultInterface;
 
     /**
      * @param string $value

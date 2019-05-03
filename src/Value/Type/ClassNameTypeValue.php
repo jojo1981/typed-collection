@@ -23,12 +23,8 @@ final class ClassNameTypeValue extends AbstractTypeValue
         if (empty($value)) {
             return 'Value can not be empty';
         }
-        if (\class_exists($value)) {
-            return \sprintf('Invalid existing class name: `%s` it is not instantiable', $value);
-        }
 
-        return \sprintf('Invalid class name: `%s`', $value);
-
+        return \sprintf('Invalid class name: `%s`. Value must be an existing class or interface.', $value);
     }
 
     /**
@@ -45,28 +41,11 @@ final class ClassNameTypeValue extends AbstractTypeValue
     }
 
     /**
-     * @param mixed $data
-     * @return bool
-     */
-    public function isValidData($data): bool
-    {
-        if (\is_object($data) && false !== $className = \get_class($data)) {
-            return $this->getValue() === $className;
-        }
-
-        return false;
-    }
-
-    /**
      * @param string $value
      * @return bool
      */
     public static function isValidValue(string $value): bool
     {
-        try {
-            return (new \ReflectionClass($value))->isInstantiable();
-        } catch (\ReflectionException $exception) {
-            return false;
-        }
+        return \class_exists($value) || \interface_exists($value);
     }
 }

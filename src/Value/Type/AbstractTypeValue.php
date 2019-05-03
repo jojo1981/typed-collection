@@ -9,7 +9,12 @@
  */
 namespace Jojo1981\TypedCollection\Value\Type;
 
+use Jojo1981\TypedCollection\Metadata\TypeMetadata;
+use Jojo1981\TypedCollection\TypeChecker;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
+use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
+use Jojo1981\TypedCollection\Value\Validation\SuccessValidationResult;
+use Jojo1981\TypedCollection\Value\Validation\ValidationResultInterface;
 
 /**
  * @package Jojo1981\TypedCollection\Value\Type
@@ -54,6 +59,27 @@ abstract class AbstractTypeValue implements TypeValueInterface
         return $this->getValue();
     }
 
+    /**
+     * @param mixed $data
+     * @throws ValueException
+     * @return ValidationResultInterface
+     */
+    final public function isValidData($data): ValidationResultInterface
+    {
+        if (TypeChecker::isDataOfExpectedType($data, $this->getValue())) {
+            return new SuccessValidationResult();
+        }
+
+        $typeMetadata = new TypeMetadata($data);
+
+        return new ErrorValidationResult(\sprintf(
+            'Data is not %s: `%s`, but %s: `%s`',
+            $this instanceof ClassNameTypeValue ? 'an instance of' : 'of expected type',
+            $this->getValue(),
+            $typeMetadata->isClassType() ? 'an instance of' : 'of type',
+            $typeMetadata->getType()
+        ));
+    }
 
     /**
      * @param string $value
@@ -89,7 +115,7 @@ abstract class AbstractTypeValue implements TypeValueInterface
     }
 
     /**
-     * Factory method design pattern
+     * Factory method
      *
      * @param string $value
      * @throws ValueException
@@ -104,9 +130,6 @@ abstract class AbstractTypeValue implements TypeValueInterface
             return new ClassNameTypeValue($value);
         }
 
-        throw new ValueException(\sprintf(
-            'Could not create a type value instance instance based on value: `%s`',
-            $value
-        ));
+        throw new ValueException(\sprintf('Could not create a type value instance based on value: `%s`', $value));
     }
 }
