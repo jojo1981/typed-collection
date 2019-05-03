@@ -197,11 +197,10 @@ class TypeMetadataTest extends TestCase
                 [new TestEntity(), 'object'],
                 [new TestEntityBase(), 'object'],
                 [new \stdClass(), \stdClass::class],
+                [new \stdClass(), '\stdClass'],
                 [new TestEntity(), TestEntity::class],
                 [new TestEntityBase(), TestEntityBase::class],
-                [new TestEntity(), TestEntityBase::class], // inheritance
-                [new TestEntity(), AbstractTestEntity::class], // inheritance
-                [new TestEntity(), InterfaceTestEntity::class], // inheritance
+                [new TestEntityBase(), TestEntity::class], // inheritance
             ]
         );
     }
