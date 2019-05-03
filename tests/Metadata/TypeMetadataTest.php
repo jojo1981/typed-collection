@@ -14,8 +14,6 @@ use Jojo1981\TypedCollection\Metadata\TypeMetadata;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use tests\Jojo1981\TypedCollection\Entity\AbstractTestEntity;
-use tests\Jojo1981\TypedCollection\Entity\InterfaceTestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntity;
 use tests\Jojo1981\TypedCollection\Entity\TestEntityBase;
 
@@ -107,7 +105,7 @@ class TypeMetadataTest extends TestCase
      */
     public function toStringShouldReturnTheCorrectStringPresentation($data, string $expectedType): void
     {
-        $this->assertEquals($expectedType, (string)new TypeMetadata($data));
+        $this->assertEquals($expectedType, (string)(new TypeMetadata($data)));
     }
 
     /**
@@ -217,7 +215,7 @@ class TypeMetadataTest extends TestCase
             }
         }
 
-        $result[] = [new TestEntityBase(), TestEntity::class]; // does not inherit
+        $result[] = [new TestEntity(), TestEntityBase::class]; // does not inherit
         $result[] = [new TestEntityBase(), \stdClass::class];
 
         return $result;
