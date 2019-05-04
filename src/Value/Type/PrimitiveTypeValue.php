@@ -48,6 +48,15 @@ final class PrimitiveTypeValue extends AbstractTypeValue
     ];
 
     /**
+     * @param TypeValueInterface $otherTypeValue
+     * @return bool
+     */
+    public function match(TypeValueInterface $otherTypeValue): bool
+    {
+        return $this->isEqual($otherTypeValue);
+    }
+
+    /**
      * @param string $type
      * @return string
      */

@@ -9,22 +9,21 @@
  */
 namespace Jojo1981\TypedCollection\Value\Type;
 
+use Jojo1981\TypedCollection\TypeChecker;
+
 /**
  * @package Jojo1981\TypedCollection\Value\Type
  */
 final class ClassNameTypeValue extends AbstractTypeValue
 {
     /**
-     * @param string $value
-     * @return string
+     * @param TypeValueInterface $otherTypeValue
+     * @return bool
      */
-    protected function getExceptionMessage(string $value): string
+    public function match(TypeValueInterface $otherTypeValue): bool
     {
-        if (empty($value)) {
-            return 'Value can not be empty';
-        }
-
-        return \sprintf('Invalid class name: `%s`. Value must be an existing class or interface.', $value);
+        return TypeChecker::isExactlyTheSameClassType($this, $otherTypeValue)
+            && TypeChecker::isInstanceOf($this->getValue(), $otherTypeValue->getValue());
     }
 
     /**
@@ -38,6 +37,19 @@ final class ClassNameTypeValue extends AbstractTypeValue
         }
 
         return $value;
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     */
+    protected function getExceptionMessage(string $value): string
+    {
+        if (empty($value)) {
+            return 'Value can not be empty';
+        }
+
+        return \sprintf('Invalid class name: `%s`. Value must be an existing class or interface.', $value);
     }
 
     /**

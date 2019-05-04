@@ -27,6 +27,12 @@ interface TypeValueInterface
      * @param TypeValueInterface $otherTypeValue
      * @return bool
      */
+    public function isEqual(TypeValueInterface $otherTypeValue): bool;
+
+    /**
+     * @param TypeValueInterface $otherTypeValue
+     * @return bool
+     */
     public function match(TypeValueInterface $otherTypeValue): bool;
 
     /**

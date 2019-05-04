@@ -95,6 +95,48 @@ class PrimitiveTypeValueTest extends TestCase
      * @throws ExpectationFailedException
      * @return void
      */
+    public function isEqualShouldReturnFalseWhenTypeValueObjectAreNotMatching(): void
+    {
+        $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);
+        $primitiveTypeValue2 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_STRING);
+
+        $classNameTypeValue = new ClassNameTypeValue(TestEntity::class);
+
+        $this->assertFalse($primitiveTypeValue1->isEqual($primitiveTypeValue2));
+        $this->assertFalse($primitiveTypeValue2->isEqual($primitiveTypeValue1));
+
+        $this->assertFalse($primitiveTypeValue1->isEqual($classNameTypeValue));
+        $this->assertFalse($primitiveTypeValue2->isEqual($classNameTypeValue));
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ValueException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function isEqualShouldReturnTrueWhenTypeValueObjectAreMatching(): void
+    {
+        $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);
+        $primitiveTypeValue2 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INTEGER);
+
+        $this->assertTrue($primitiveTypeValue1->isEqual($primitiveTypeValue1));
+        $this->assertTrue($primitiveTypeValue2->isEqual($primitiveTypeValue2));
+
+        $this->assertTrue($primitiveTypeValue1->isEqual($primitiveTypeValue2));
+        $this->assertTrue($primitiveTypeValue2->isEqual($primitiveTypeValue1));
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ValueException
+     * @throws ExpectationFailedException
+     * @return void
+     */
     public function matchShouldReturnFalseWhenTypeValueObjectAreNotMatching(): void
     {
         $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);

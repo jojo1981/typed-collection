@@ -37,9 +37,10 @@ abstract class AbstractTypeValue implements TypeValueInterface
      * @param TypeValueInterface $otherTypeValue
      * @return bool
      */
-    final public function match(TypeValueInterface $otherTypeValue): bool
+    final public function isEqual(TypeValueInterface $otherTypeValue): bool
     {
-        return \get_class($otherTypeValue) === \get_class($this) && $this->getValue() === $otherTypeValue->getValue();
+        return TypeChecker::isExactlyTheSameClassType($this, $otherTypeValue)
+            && $this->getValue() === $otherTypeValue->getValue();
     }
 
     /**

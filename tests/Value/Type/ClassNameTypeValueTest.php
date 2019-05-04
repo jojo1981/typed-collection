@@ -97,17 +97,69 @@ class ClassNameTypeValueTest extends TestCase
      * @throws ExpectationFailedException
      * @return void
      */
-    public function matchShouldReturnFalseWhenTypeValueObjectAreNotMatching(): void
+    public function isEqualShouldReturnFalseWhenTypeValueObjectAreNotMatching(): void
     {
         $classNameTypeValue1 = new ClassNameTypeValue(TestEntityBase::class);
         $classNameTypeValue2 = new ClassNameTypeValue(TestEntity::class);
 
         $primitiveTypeValue = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_STRING);
 
-        $this->assertFalse($classNameTypeValue1->match($classNameTypeValue2));
-        $this->assertFalse($classNameTypeValue2->match($primitiveTypeValue));
+        $this->assertFalse($classNameTypeValue1->isEqual($classNameTypeValue2));
+        $this->assertFalse($classNameTypeValue2->isEqual($primitiveTypeValue));
+
+        $this->assertFalse($classNameTypeValue1->isEqual($primitiveTypeValue));
+        $this->assertFalse($classNameTypeValue2->isEqual($classNameTypeValue1));
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ValueException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function isEqualShouldReturnTrueWhenTypeValueObjectAreMatching(): void
+    {
+        $classNameTypeValue1 = new ClassNameTypeValue(TestEntity::class);
+        $classNameTypeValue2 = new ClassNameTypeValue(TestEntity::class);
+
+        $this->assertTrue($classNameTypeValue1->isEqual($classNameTypeValue1));
+        $this->assertTrue($classNameTypeValue2->isEqual($classNameTypeValue2));
+
+        $this->assertTrue($classNameTypeValue1->isEqual($classNameTypeValue2));
+        $this->assertTrue($classNameTypeValue2->isEqual($classNameTypeValue1));
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ValueException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function matchShouldReturnFalse(): void
+    {
+        $classNameTypeValue1 = new ClassNameTypeValue(InterfaceTestEntity::class);
+        $classNameTypeValue2 = new ClassNameTypeValue(AbstractTestEntity::class);
+        $classNameTypeValue3 = new ClassNameTypeValue(TestEntityBase::class);
+        $classNameTypeValue4 = new ClassNameTypeValue(TestEntity::class);
+
+        $primitiveTypeValue = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_STRING);
 
         $this->assertFalse($classNameTypeValue1->match($primitiveTypeValue));
+        $this->assertFalse($classNameTypeValue2->match($primitiveTypeValue));
+        $this->assertFalse($classNameTypeValue3->match($primitiveTypeValue));
+        $this->assertFalse($classNameTypeValue4->match($primitiveTypeValue));
+
+        $this->assertFalse($classNameTypeValue4->match($classNameTypeValue3));
+        $this->assertFalse($classNameTypeValue4->match($classNameTypeValue2));
+        $this->assertFalse($classNameTypeValue4->match($classNameTypeValue1));
+
+        $this->assertFalse($classNameTypeValue3->match($classNameTypeValue2));
+        $this->assertFalse($classNameTypeValue3->match($classNameTypeValue1));
+
         $this->assertFalse($classNameTypeValue2->match($classNameTypeValue1));
     }
 
@@ -119,16 +171,26 @@ class ClassNameTypeValueTest extends TestCase
      * @throws ExpectationFailedException
      * @return void
      */
-    public function matchShouldReturnTrueWhenTypeValueObjectAreMatching(): void
+    public function matchShouldReturnTrue(): void
     {
-        $classNameTypeValue1 = new ClassNameTypeValue(TestEntity::class);
-        $classNameTypeValue2 = new ClassNameTypeValue(TestEntity::class);
+        $classNameTypeValue1 = new ClassNameTypeValue(InterfaceTestEntity::class);
+        $classNameTypeValue2 = new ClassNameTypeValue(AbstractTestEntity::class);
+        $classNameTypeValue3 = new ClassNameTypeValue(TestEntityBase::class);
+        $classNameTypeValue4 = new ClassNameTypeValue(TestEntity::class);
 
         $this->assertTrue($classNameTypeValue1->match($classNameTypeValue1));
-        $this->assertTrue($classNameTypeValue2->match($classNameTypeValue2));
-
         $this->assertTrue($classNameTypeValue1->match($classNameTypeValue2));
-        $this->assertTrue($classNameTypeValue2->match($classNameTypeValue1));
+        $this->assertTrue($classNameTypeValue1->match($classNameTypeValue3));
+        $this->assertTrue($classNameTypeValue1->match($classNameTypeValue4));
+
+        $this->assertTrue($classNameTypeValue2->match($classNameTypeValue2));
+        $this->assertTrue($classNameTypeValue2->match($classNameTypeValue3));
+        $this->assertTrue($classNameTypeValue2->match($classNameTypeValue4));
+
+        $this->assertTrue($classNameTypeValue3->match($classNameTypeValue3));
+        $this->assertTrue($classNameTypeValue3->match($classNameTypeValue4));
+
+        $this->assertTrue($classNameTypeValue4->match($classNameTypeValue4));
     }
 
     /**
