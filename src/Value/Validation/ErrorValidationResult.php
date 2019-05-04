@@ -12,6 +12,9 @@ namespace Jojo1981\TypedCollection\Value\Validation;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 
 /**
+ * This class can be used to return when the validation was NOT successful and must be constructed with a message string.
+ *
+ * @internal
  * @package Jojo1981\TypedCollection\Value\Validation
  */
 class ErrorValidationResult implements ValidationResultInterface
@@ -20,6 +23,8 @@ class ErrorValidationResult implements ValidationResultInterface
     private $message;
 
     /**
+     * The message string which contains some detailed information about the validation failure.
+     *
      * @param string $message
      * @throws ValueException
      */

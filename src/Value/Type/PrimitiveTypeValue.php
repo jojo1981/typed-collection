@@ -10,6 +10,11 @@
 namespace Jojo1981\TypedCollection\Value\Type;
 
 /**
+ * This value class represent primitive types. Also the pseudo types: double, number will be accept but considered as a
+ * float. The short values for a boolean and integer (`bool` and `int`) will be accepted, but transformed into the long
+ * notation.
+ *
+ * @internal
  * @package Jojo1981\TypedCollection\Value\Type
  */
 final class PrimitiveTypeValue extends AbstractTypeValue

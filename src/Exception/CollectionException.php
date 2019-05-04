@@ -10,6 +10,10 @@
 namespace Jojo1981\TypedCollection\Exception;
 
 /**
+ * This is the base exception class for this library an all other exceptions thrown by this library extends from this
+ * exceptions.
+ *
+ * @api
  * @package Jojo1981\TypedCollection\Exception
  */
 class CollectionException extends \DomainException

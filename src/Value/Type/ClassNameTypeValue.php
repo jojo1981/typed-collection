@@ -12,6 +12,9 @@ namespace Jojo1981\TypedCollection\Value\Type;
 use Jojo1981\TypedCollection\TypeChecker;
 
 /**
+ * This value class represent class and interface types.
+ *
+ * @internal
  * @package Jojo1981\TypedCollection\Value\Type
  */
 final class ClassNameTypeValue extends AbstractTypeValue

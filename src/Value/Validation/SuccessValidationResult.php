@@ -10,6 +10,9 @@
 namespace Jojo1981\TypedCollection\Value\Validation;
 
 /**
+ * This class can be used to return when a successful validation has occurred.
+ *
+ * @internal
  * @package Jojo1981\TypedCollection\Value\Validation
  */
 class SuccessValidationResult implements ValidationResultInterface

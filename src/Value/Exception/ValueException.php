@@ -12,6 +12,7 @@ namespace Jojo1981\TypedCollection\Value\Exception;
 use Jojo1981\TypedCollection\Exception\CollectionException;
 
 /**
+ * @api
  * @package Jojo1981\TypedCollection\Value\Exception
  */
 class ValueException extends CollectionException

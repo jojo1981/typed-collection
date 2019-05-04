@@ -10,6 +10,7 @@
 namespace Jojo1981\TypedCollection;
 
 /**
+ * @api
  * @package Jojo1981\TypedCollection
  */
 class CollectionIterator implements \SeekableIterator, \ArrayAccess, \Countable

@@ -16,6 +16,10 @@ use Jojo1981\TypedCollection\Value\Validation\SuccessValidationResult;
 use Jojo1981\TypedCollection\Value\Validation\ValidationResultInterface;
 
 /**
+ * This class will function as a helper for the 2 concrete type classes: `PrimitiveTypeValue` and `ClassNameTypeValue`.
+ * It also provides a static factory method to create a type class based on data.
+ *
+ * @internal
  * @package Jojo1981\TypedCollection\Value\Type
  */
 abstract class AbstractTypeValue implements TypeValueInterface

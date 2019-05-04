@@ -10,6 +10,7 @@
 namespace Jojo1981\TypedCollection;
 
 /**
+ * @internal
  * @package Jojo1981\TypedCollection
  */
 final class TypeChecker
