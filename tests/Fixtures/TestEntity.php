@@ -7,11 +7,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace tests\Jojo1981\TypedCollection\Entity;
+namespace tests\Jojo1981\TypedCollection\Fixtures;
 
 /**
- * @package tests\Jojo1981\TypedCollection\Entity
+ * @package tests\Jojo1981\TypedCollection\Fixtures
  */
-abstract class AbstractTestEntity implements InterfaceTestEntity
+class TestEntity extends TestEntityBase
 {
 }

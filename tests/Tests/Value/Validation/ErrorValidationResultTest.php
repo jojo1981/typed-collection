@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace tests\Jojo1981\TypedCollection\Value\Validation;
+namespace tests\Jojo1981\TypedCollection\Tests\Value\Validation;
 
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package tests\Jojo1981\TypedCollection\Value\Validation
+ * @package tests\Jojo1981\TypedCollection\Tests\Value\Validation
  */
 class ErrorValidationResultTest extends TestCase
 {
