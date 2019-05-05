@@ -30,12 +30,16 @@
   },
   "autoload": {
     "psr-4": {
-      "Jojo1981\\TypedCollection\\": "src/",
-      "tests\\Jojo1981\\TypedCollection\\": "tests/"
+      "Jojo1981\\TypedCollection\\": "src/"
     }
   },
   "config": {
     "bin-dir": "bin",
     "sort-packages": true
+  },
+  "scripts": {
+    "test": [
+      "./bin/phpunit"
+    ]
   }
 }
