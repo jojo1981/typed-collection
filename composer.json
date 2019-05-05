@@ -24,6 +24,10 @@
     "php-coveralls/php-coveralls": "2.1.x-dev",
     "phpunit/phpunit": "7.5.x-dev"
   },
+  "suggest": {
+    "jms/serializer": "Library for (de-)serializing data of any complexity; supports XML, JSON, and YAML.",
+    "jojo1981/jms-serializer-handlers": "Add support to work with the jms/serializer package"
+  },
   "autoload": {
     "psr-4": {
       "Jojo1981\\TypedCollection\\": "src/",
