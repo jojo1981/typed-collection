@@ -11,6 +11,7 @@ namespace Jojo1981\TypedCollection\TestSuite\Tests;
 
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
+use Jojo1981\TypedCollection\TestSuite\Fixtures\AbstractTestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixtures\InterfaceTestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase;
@@ -75,6 +76,22 @@ class CollectionTest extends TestCase
     {
         $this->expectExceptionObject(new CollectionException($message));
         new Collection($type, $invalidData);
+    }
+
+    /**
+     * @test
+     * @dataProvider getValidTypesMap
+     *
+     * @param string $type
+     * @param string $expectedType
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function getTypeShouldReturnTheCorrectType(string $type, string $expectedType): void
+    {
+        $this->assertEquals($expectedType, (new Collection($type))->getType());
     }
 
     /**
@@ -190,7 +207,29 @@ class CollectionTest extends TestCase
     public function getClassNameTypeWithInvalidData(): array
     {
         return [
-            [TestEntity::class, [new TestEntity(), 'text'], 'Data is not an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`, but of type: `string`']
+            [TestEntity::class, [new TestEntity(), 'text'], 'Data is not an instance of: `tests\Jojo1981\TypedCollection\Fixtures\TestEntity`, but of type: `string`']
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getValidTypesMap(): array
+    {
+        return [
+            ['int', 'integer'],
+            ['integer', 'integer'],
+            ['bool', 'boolean'],
+            ['boolean', 'boolean'],
+            ['float', 'float'],
+            ['double', 'float'],
+            ['number', 'float'],
+            ['array', 'array'],
+            ['object', 'object'],
+            [TestEntity::class , TestEntity::class],
+            [TestEntityBase::class, TestEntityBase::class],
+            [AbstractTestEntity::class, AbstractTestEntity::class],
+            [InterfaceTestEntity::class, InterfaceTestEntity::class]
         ];
     }
 }
