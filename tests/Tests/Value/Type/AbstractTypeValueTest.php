@@ -7,8 +7,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace tests\Jojo1981\TypedCollection\Tests\Value\Type;
+namespace Jojo1981\TypedCollection\TestSuite\Tests\Value\Type;
 
+use Jojo1981\TypedCollection\TestSuite\Fixtures\AbstractTestEntity;
+use Jojo1981\TypedCollection\TestSuite\Fixtures\InterfaceTestEntity;
+use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity;
+use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Type\AbstractTypeValue;
 use Jojo1981\TypedCollection\Value\Type\ClassNameTypeValue;
@@ -16,13 +20,9 @@ use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use tests\Jojo1981\TypedCollection\Fixtures\AbstractTestEntity;
-use tests\Jojo1981\TypedCollection\Fixtures\InterfaceTestEntity;
-use tests\Jojo1981\TypedCollection\Fixtures\TestEntity;
-use tests\Jojo1981\TypedCollection\Fixtures\TestEntityBase;
 
 /**
- * @package tests\Jojo1981\TypedCollection\Tests\Value\Type
+ * @package Jojo1981\TypedCollection\TestSuite\Tests\Value\Type
  */
 class AbstractTypeValueTest extends TestCase
 {

@@ -14,6 +14,6 @@
     }
 
     $loader = require $autoloadFile;
-    $loader->addPsr4('tests\\Jojo1981\\TypedCollection\\', __DIR__);
+    $loader->addPsr4('Jojo1981\\TypedCollection\\TestSuite\\', __DIR__);
 
 });

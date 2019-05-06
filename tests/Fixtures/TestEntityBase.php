@@ -7,10 +7,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace tests\Jojo1981\TypedCollection\Fixtures;
+namespace Jojo1981\TypedCollection\TestSuite\Fixtures;
 
 /**
- * @package tests\Jojo1981\TypedCollection\Fixtures
+ * @package Jojo1981\TypedCollection\TestSuite\Fixtures
  */
 class TestEntityBase extends AbstractTestEntity
 {
