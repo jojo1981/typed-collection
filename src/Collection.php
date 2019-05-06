@@ -38,11 +38,9 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function __construct(string $type, array $elements = [])
     {
-        if (!AbstractTypeValue::isValidValue($type)) {
-            throw CollectionException::typeIsNotValid($type);
-        }
+        static::assertType($type);
         $this->type = AbstractTypeValue::createTypeValueInstance($type);
-        $this->addElements($elements);
+        $this->pushElements($elements);
     }
 
     /**
@@ -183,7 +181,9 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function pushElements(array $elements): void
     {
-        \array_walk($elements, [$this, 'pushElement']);
+        foreach ($elements as $element) {
+            $this->pushElement($element);
+        }
     }
 
     /**
@@ -195,8 +195,9 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function unshiftElements(array $elements): void
     {
-        $elements =\array_reverse($elements);
-        \array_walk($elements, [$this, 'unshiftElement']);
+        foreach (\array_reverse($elements) as $element) {
+            $this->unshiftElement($element);
+        }
     }
 
     /**
@@ -330,6 +331,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function map(string $type, callable $mapper): Collection
     {
+        static::assertType($type);
         $elements = $this->toArray();
 
         return new Collection(
@@ -358,6 +360,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function flatMap(string $type, callable $mapper): Collection
     {
+        static::assertType($type);
         $result = [];
         foreach ($this->elements as $index => $value) {
             \array_push($result, ...$mapper($value, $index));
@@ -375,7 +378,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function merge(Collection $otherCollection): void
     {
-        if (!$this->isEqualType($otherCollection)) {
+        if (!$this->type->match($otherCollection->type)) {
             throw CollectionException::couldNotMergeCollection($this->type->getValue(), $otherCollection->getType());
         }
 
@@ -654,19 +657,12 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public static function createFromCollections(string $type, array $collections): Collection
     {
-        $collections = \array_values($collections);
-        if (empty($collections)) {
-            throw new CollectionException('An empty array with typed collections passed');
-        }
-        if (\count($collections) < 2) {
-            throw new CollectionException('At least 2 collections needs to be passed');
-        }
+        static::assertType($type);
+        $typeValue = AbstractTypeValue::createTypeValueInstance($type);
+        self::assertCollections($collections, $typeValue);
 
-        $result = new Collection($type);
+        $result = new Collection($typeValue->getValue());
         foreach ($collections as $collection) {
-            if (!$collection instanceof self) {
-                throw new CollectionException('Expect $collections array to contain instances of Collection');
-            }
             $result->merge($collection);
         }
 
@@ -702,5 +698,45 @@ class Collection implements \Countable, \IteratorAggregate
                 $collectionArrays
             )
         );
+    }
+
+    /**
+     * @param Collection[] $collections
+     * @param TypeValueInterface $typeValue
+     * @throws CollectionException
+     * @return void
+     */
+    private static function assertCollections(array $collections, TypeValueInterface $typeValue): void
+    {
+        if (empty($collections)) {
+            throw new CollectionException('An empty array with typed collections passed');
+        }
+        if (\count($collections) < 2) {
+            throw new CollectionException('At least 2 collections needs to be passed');
+        }
+        foreach ($collections as $collection) {
+            if (!$collection instanceof self) {
+                throw new CollectionException('Expect $collections array to contain instances of Collection');
+            }
+            if (!$typeValue->match($collection->type)) {
+                throw new CollectionException(\sprintf(
+                    'Expect every collection to be of type: `%s`. Collection found with type: `%s`',
+                    $typeValue->getValue(),
+                    $collection->type->getValue()
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param string $type
+     * @throws CollectionException
+     * @return void
+     */
+    private static function assertType(string $type): void
+    {
+        if (!AbstractTypeValue::isValidValue($type)) {
+            throw CollectionException::typeIsNotValid($type);
+        }
     }
 }
