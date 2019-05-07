@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\TestSuite\Tests;
+namespace Jojo1981\TypedCollection\TestSuite\Test;
 
 use Jojo1981\TypedCollection\CollectionIterator;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -20,7 +20,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package Jojo1981\TypedCollection\TestSuite\Tests
+ * @package Jojo1981\TypedCollection\TestSuite\Test
  */
 class CollectionIteratorTest extends TestCase
 {

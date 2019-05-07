@@ -7,20 +7,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\TestSuite\Tests;
+namespace Jojo1981\TypedCollection\TestSuite\Test;
 
 use Jojo1981\TypedCollection\Collection;
 use Jojo1981\TypedCollection\Exception\CollectionException;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\AbstractTestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\InterfaceTestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase;
+use Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity;
+use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity;
+use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package Jojo1981\TypedCollection\TestSuite\Tests
+ * @package Jojo1981\TypedCollection\TestSuite\Test
  */
 class CollectionTest extends TestCase
 {
@@ -40,7 +39,7 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getPrimitiveTypeWithInvalidData
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getPrimitiveTypeWithInvalidData
      *
      * @param string $type
      * @param mixed[] $invalidData
@@ -60,7 +59,7 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getPrimitiveTypeWithInvalidData
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getClassNameTypeWithInvalidData
      *
      * @param string $type
      * @param mixed[] $invalidData
@@ -80,7 +79,7 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidTypesMap
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getValidTypesMap
      *
      * @param string $type
      * @param string $expectedType
@@ -189,47 +188,5 @@ class CollectionTest extends TestCase
         );
 
         $this->assertEquals($expectedResult, $actualResult);
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getPrimitiveTypeWithInvalidData(): array
-    {
-        return [
-            ['string', ['text', 1], 'Data is not of expected type: `string`, but of type: `integer`']
-        ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getClassNameTypeWithInvalidData(): array
-    {
-        return [
-            [TestEntity::class, [new TestEntity(), 'text'], 'Data is not an instance of: `tests\Jojo1981\TypedCollection\Fixtures\TestEntity`, but of type: `string`']
-        ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getValidTypesMap(): array
-    {
-        return [
-            ['int', 'integer'],
-            ['integer', 'integer'],
-            ['bool', 'boolean'],
-            ['boolean', 'boolean'],
-            ['float', 'float'],
-            ['double', 'float'],
-            ['number', 'float'],
-            ['array', 'array'],
-            ['object', 'object'],
-            [TestEntity::class , TestEntity::class],
-            [TestEntityBase::class, TestEntityBase::class],
-            [AbstractTestEntity::class, AbstractTestEntity::class],
-            [InterfaceTestEntity::class, InterfaceTestEntity::class]
-        ];
     }
 }

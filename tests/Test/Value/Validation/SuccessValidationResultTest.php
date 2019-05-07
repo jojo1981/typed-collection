@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\TestSuite\Tests\Value\Validation;
+namespace Jojo1981\TypedCollection\TestSuite\Test\Value\Validation;
 
 use Jojo1981\TypedCollection\Value\Validation\SuccessValidationResult;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package Jojo1981\TypedCollection\TestSuite\Tests\Value\Validation
+ * @package Jojo1981\TypedCollection\TestSuite\Test\Value\Validation
  */
 class SuccessValidationResultTest extends TestCase
 {

@@ -7,28 +7,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\TestSuite\Tests\Value\Type;
+namespace Jojo1981\TypedCollection\TestSuite\Test\Value\Type;
 
-use Jojo1981\TypedCollection\TestSuite\Fixtures\AbstractTestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\InterfaceTestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Type\AbstractTypeValue;
-use Jojo1981\TypedCollection\Value\Type\ClassNameTypeValue;
-use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package Jojo1981\TypedCollection\TestSuite\Tests\Value\Type
+ * @package Jojo1981\TypedCollection\TestSuite\Test\Value\Type
  */
 class AbstractTypeValueTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider getInvalidTypeStrings
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\AbstractTypeValue::getInvalidTypeStrings
      *
      * @param string $value
      * @throws InvalidArgumentException
@@ -42,7 +36,7 @@ class AbstractTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidTypeStrings
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\AbstractTypeValue::getValidTypeStrings
      *
      * @param string $value
      * @throws ExpectationFailedException
@@ -56,7 +50,7 @@ class AbstractTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getInvalidTypeStrings
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\AbstractTypeValue::getInvalidTypeStrings
      *
      * @param string $value
      * @param string $message
@@ -74,7 +68,7 @@ class AbstractTypeValueTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getValidTypeStrings
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\AbstractTypeValue::getValidTypeStrings
      *
      * @param string $value
      * @param string $expectedInstanceOf
@@ -89,43 +83,5 @@ class AbstractTypeValueTest extends TestCase
     ): void
     {
         $this->assertInstanceOf($expectedInstanceOf, AbstractTypeValue::createTypeValueInstance($value));
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getInvalidTypeStrings(): array
-    {
-        return [
-            ['invalid-type-value', 'Could not create a type value instance based on value: `invalid-type-value`'],
-            // existing namespace but no a class or interface
-            ['tests\Jojo1981\TypedCollection', 'Could not create a type value instance based on value: `tests\Jojo1981\TypedCollection`'],
-            ['Non\Existing\Class', 'Could not create a type value instance based on value: `Non\Existing\Class`']
-        ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getValidTypeStrings(): array
-    {
-        return [
-            ['int', PrimitiveTypeValue::class],
-            ['integer', PrimitiveTypeValue::class],
-            ['float', PrimitiveTypeValue::class],
-            ['double', PrimitiveTypeValue::class],
-            ['number', PrimitiveTypeValue::class],
-            ['bool', PrimitiveTypeValue::class],
-            ['boolean', PrimitiveTypeValue::class],
-            ['string', PrimitiveTypeValue::class],
-            ['array', PrimitiveTypeValue::class],
-            ['object', PrimitiveTypeValue::class],
-            [\stdClass::class, ClassNameTypeValue::class],
-            ['\stdClass', ClassNameTypeValue::class],
-            [TestEntityBase::class, ClassNameTypeValue::class],
-            [TestEntity::class, ClassNameTypeValue::class],
-            [InterfaceTestEntity::class, ClassNameTypeValue::class],
-            [AbstractTestEntity::class, ClassNameTypeValue::class]
-        ];
     }
 }

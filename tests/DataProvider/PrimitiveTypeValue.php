@@ -7,211 +7,26 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\TestSuite\Tests\Value\Type;
+namespace Jojo1981\TypedCollection\TestSuite\DataProvider;
 
-use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity;
-use Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase;
+use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity;
+use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase;
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
-use Jojo1981\TypedCollection\Value\Type\ClassNameTypeValue;
-use Jojo1981\TypedCollection\Value\Type\PrimitiveTypeValue;
 use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
 use Jojo1981\TypedCollection\Value\Validation\SuccessValidationResult;
-use Jojo1981\TypedCollection\Value\Validation\ValidationResultInterface;
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package Jojo1981\TypedCollection\TestSuite\Tests\Value\Type
+ * @package Jojo1981\TypedCollection\TestSuite\DataProvider
  */
-class PrimitiveTypeValueTest extends TestCase
+class PrimitiveTypeValue
 {
-    /**
-     * @test
-     * @dataProvider getInvalidValueStrings
-     *
-     * @param string $value
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @return void
-     */
-    public function isValidValueShouldReturnFalseForInvalidValue(string $value): void
-    {
-        $this->assertFalse(PrimitiveTypeValue::isValidValue($value));
-    }
-
-    /**
-     * @test
-     * @dataProvider getInvalidValueStrings
-     *
-     * @param string $value
-     * @param string $message
-     * @throws ValueException
-     * @return void
-     */
-    public function constructWithInvalidTypeShouldThrowValueException(string $value, string $message): void
-    {
-        $this->expectExceptionObject(new ValueException($message));
-        new PrimitiveTypeValue($value);
-    }
-
-    /**
-     * @test
-     * @dataProvider getValidValueStrings
-     *
-     * @param string $value
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @return void
-     */
-    public function isValidValueShouldReturnTrueForValidValue(string $value): void
-    {
-        $this->assertTrue(PrimitiveTypeValue::isValidValue($value));
-    }
-
-    /**
-     * @test
-     * @dataProvider getValidValueStrings
-     *
-     * @param string $value
-     * @param string $mappedValue
-     * @throws ValueException
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @return void
-     */
-    public function constructWithValidValueShouldReturnCorrectMappedValue(string $value, string $mappedValue): void
-    {
-        $classNameTypeValue = new PrimitiveTypeValue($value);
-        $this->assertEquals($mappedValue, $classNameTypeValue->getValue());
-        $this->assertEquals($mappedValue, (string) $classNameTypeValue);
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ValueException
-     * @throws ExpectationFailedException
-     * @return void
-     */
-    public function isEqualShouldReturnFalseWhenTypeValueObjectAreNotMatching(): void
-    {
-        $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);
-        $primitiveTypeValue2 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_STRING);
-
-        $classNameTypeValue = new ClassNameTypeValue(TestEntity::class);
-
-        $this->assertFalse($primitiveTypeValue1->isEqual($primitiveTypeValue2));
-        $this->assertFalse($primitiveTypeValue2->isEqual($primitiveTypeValue1));
-
-        $this->assertFalse($primitiveTypeValue1->isEqual($classNameTypeValue));
-        $this->assertFalse($primitiveTypeValue2->isEqual($classNameTypeValue));
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ValueException
-     * @throws ExpectationFailedException
-     * @return void
-     */
-    public function isEqualShouldReturnTrueWhenTypeValueObjectAreMatching(): void
-    {
-        $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);
-        $primitiveTypeValue2 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INTEGER);
-
-        $this->assertTrue($primitiveTypeValue1->isEqual($primitiveTypeValue1));
-        $this->assertTrue($primitiveTypeValue2->isEqual($primitiveTypeValue2));
-
-        $this->assertTrue($primitiveTypeValue1->isEqual($primitiveTypeValue2));
-        $this->assertTrue($primitiveTypeValue2->isEqual($primitiveTypeValue1));
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ValueException
-     * @throws ExpectationFailedException
-     * @return void
-     */
-    public function matchShouldReturnFalseWhenTypeValueObjectAreNotMatching(): void
-    {
-        $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);
-        $primitiveTypeValue2 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_STRING);
-
-        $classNameTypeValue = new ClassNameTypeValue(TestEntity::class);
-
-        $this->assertFalse($primitiveTypeValue1->match($primitiveTypeValue2));
-        $this->assertFalse($primitiveTypeValue2->match($primitiveTypeValue1));
-
-        $this->assertFalse($primitiveTypeValue1->match($classNameTypeValue));
-        $this->assertFalse($primitiveTypeValue2->match($classNameTypeValue));
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ValueException
-     * @throws ExpectationFailedException
-     * @return void
-     */
-    public function matchShouldReturnTrueWhenTypeValueObjectAreMatching(): void
-    {
-        $primitiveTypeValue1 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INT);
-        $primitiveTypeValue2 = new PrimitiveTypeValue(PrimitiveTypeValue::VALUE_INTEGER);
-
-        $this->assertTrue($primitiveTypeValue1->match($primitiveTypeValue1));
-        $this->assertTrue($primitiveTypeValue2->match($primitiveTypeValue2));
-
-        $this->assertTrue($primitiveTypeValue1->match($primitiveTypeValue2));
-        $this->assertTrue($primitiveTypeValue2->match($primitiveTypeValue1));
-    }
-
-    /**
-     * @test
-     *
-     * @throws InvalidArgumentException
-     * @throws ExpectationFailedException
-     * @return void
-     */
-    public function getValidValuesShouldReturnAllValidValues(): void
-    {
-        $this->assertEquals(
-            ['int', 'integer', 'float', 'double', 'number', 'bool', 'boolean', 'string', 'array', 'object'],
-            PrimitiveTypeValue::getValidValues()
-        );
-    }
-
-    /**
-     * @test
-     * @dataProvider getIsValidDataTestData
-     *
-     * @param string $value
-     * @param mixed $data
-     * @param ValidationResultInterface $expectValidationResult
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @throws ValueException
-     * @return void
-     */
-    public function isValidDataShouldReturnReturnTheCorrectValidationResult(
-        string $value,
-        $data,
-        ValidationResultInterface $expectValidationResult
-    ): void
-    {
-        $this->assertEquals($expectValidationResult, (new PrimitiveTypeValue($value))->isValidData($data));
-    }
-
     /**
      * @return array[]
      */
     public function getValidValueStrings(): array
     {
+        // SIGNATURE: string $value, string $mappedValue
+
         return [
             ['int', 'integer'],
             ['integer', 'integer'],
@@ -241,9 +56,11 @@ class PrimitiveTypeValueTest extends TestCase
      */
     public function getInvalidValueStrings(): array
     {
+        // SIGNATURE: string $value, string $message
+
         return [
             ['invalid-type-value', 'Invalid type: `invalid-type-value` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]'],
-            [TestEntity::class, 'Invalid type: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]'],
+            [TestEntity::class, 'Invalid type: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]'],
             [\stdClass::class, 'Invalid type: `stdClass` given. Valid types are [int, integer, float, double, number, bool, boolean, string, array, object]']
         ];
     }
@@ -254,9 +71,10 @@ class PrimitiveTypeValueTest extends TestCase
      */
     public function getIsValidDataTestData(): array
     {
+        // SIGNATURE: string $value, mixed $data, ValidationResultInterface $expectValidationResult
         return [
 
-            // Successes
+            // Success
 
             ['integer', -1, new SuccessValidationResult()],
             ['integer', 0, new SuccessValidationResult()],
@@ -307,7 +125,7 @@ class PrimitiveTypeValueTest extends TestCase
             ['object', new TestEntity(), new SuccessValidationResult()],
             ['object', new TestEntityBase(), new SuccessValidationResult()],
 
-            // Errors
+            // Error
 
             ['integer', 3.47, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
             ['integer', -5.23, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
@@ -320,8 +138,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['integer', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
             ['integer', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
             ['integer', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `stdClass`')],
-            ['integer', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['integer', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['integer', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['integer', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['int', 3.47, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
             ['int', -5.23, new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `float`')],
@@ -334,8 +152,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['int', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
             ['int', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `integer`, but of type: `array`')],
             ['int', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `stdClass`')],
-            ['int', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['int', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['int', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['int', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `integer`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['float', 0, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
             ['float', 1, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
@@ -348,8 +166,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['float', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
             ['float', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
             ['float', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `stdClass`')],
-            ['float', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['float', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['float', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['float', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['double', 0, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
             ['double', 1, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
@@ -362,8 +180,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['double', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
             ['double', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
             ['double', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `stdClass`')],
-            ['double', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['double', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['double', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['double', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['number', 0, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
             ['number', 1, new ErrorValidationResult('Data is not of expected type: `float`, but of type: `integer`')],
@@ -376,8 +194,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['number', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
             ['number', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `float`, but of type: `array`')],
             ['number', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `stdClass`')],
-            ['number', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['number', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['number', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['number', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `float`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['boolean', 0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
             ['boolean', 1, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
@@ -392,8 +210,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['boolean', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
             ['boolean', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
             ['boolean', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `stdClass`')],
-            ['boolean', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['boolean', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['boolean', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['boolean', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['bool', 0, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
             ['bool', 1, new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `integer`')],
@@ -408,8 +226,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['bool', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
             ['bool', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `boolean`, but of type: `array`')],
             ['bool', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `stdClass`')],
-            ['bool', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['bool', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['bool', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['bool', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `boolean`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['string', 0, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `integer`')],
             ['string', 1, new ErrorValidationResult('Data is not of expected type: `string`, but of type: `integer`')],
@@ -425,8 +243,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['string', ['item1', 'item2'], new ErrorValidationResult('Data is not of expected type: `string`, but of type: `array`')],
             ['string', ['key' => ' value'], new ErrorValidationResult('Data is not of expected type: `string`, but of type: `array`')],
             ['string', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `stdClass`')],
-            ['string', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['string', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['string', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['string', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `string`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['array', 0, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `integer`')],
             ['array', 1, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `integer`')],
@@ -440,8 +258,8 @@ class PrimitiveTypeValueTest extends TestCase
             ['array', true, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `boolean`')],
             ['array', false, new ErrorValidationResult('Data is not of expected type: `array`, but of type: `boolean`')],
             ['array', new \stdClass(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `stdClass`')],
-            ['array', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntity`')],
-            ['array', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixtures\TestEntityBase`')],
+            ['array', new TestEntity(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`')],
+            ['array', new TestEntityBase(), new ErrorValidationResult('Data is not of expected type: `array`, but an instance of: `Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`')],
 
             ['object', 0, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `integer`')],
             ['object', 1, new ErrorValidationResult('Data is not of expected type: `object`, but of type: `integer`')],

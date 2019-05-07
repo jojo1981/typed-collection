@@ -13,6 +13,7 @@
         throw new \RuntimeException('Did not find vendor/autoload.php. Did you run "composer install --dev"?');
     }
 
+    /** @var \Composer\Autoload\ClassLoader $loader */
     $loader = require $autoloadFile;
     $loader->addPsr4('Jojo1981\\TypedCollection\\TestSuite\\', __DIR__);
 

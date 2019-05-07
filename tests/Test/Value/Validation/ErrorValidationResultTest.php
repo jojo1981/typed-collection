@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed in the root of the source code
  */
-namespace Jojo1981\TypedCollection\TestSuite\Tests\Value\Validation;
+namespace Jojo1981\TypedCollection\TestSuite\Test\Value\Validation;
 
 use Jojo1981\TypedCollection\Value\Exception\ValueException;
 use Jojo1981\TypedCollection\Value\Validation\ErrorValidationResult;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package Jojo1981\TypedCollection\TestSuite\Tests\Value\Validation
+ * @package Jojo1981\TypedCollection\TestSuite\Test\Value\Validation
  */
 class ErrorValidationResultTest extends TestCase
 {
@@ -47,24 +47,15 @@ class ErrorValidationResultTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getTestData
      *
-     * @param string $message
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
      * @throws ValueException
      * @return void
      */
-    public function getMessageShouldReturnTheCorrectMessage(string $message): void
+    public function getMessageShouldReturnTheCorrectMessage(): void
     {
-        $this->assertEquals($message, (new ErrorValidationResult($message))->getMessage());
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getTestData(): array
-    {
-        return [['test message 1'], ['test message 2']];
+        $this->assertEquals('test message 1', (new ErrorValidationResult('test message 1'))->getMessage());
+        $this->assertEquals('test message 2', (new ErrorValidationResult('test message 2'))->getMessage());
     }
 }
