@@ -95,6 +95,38 @@ class CollectionTest extends TestCase
 
     /**
      * @test
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getNotMatchingTypes
+     *
+     * @param string $typeA
+     * @param string $typeB
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualTypeShouldReturnFalseWhenTypeNotStrictlyMatches(string $typeA, string $typeB): void
+    {
+        $this->assertFalse((new Collection($typeA))->isEqualType(new Collection($typeB)));
+    }
+
+    /**
+     * @test
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getStrictlyMatchingTypes
+     *
+     * @param string $typeA
+     * @param string $typeB
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualTypeShouldReturnTrueWhenTypeStrictlyMatches(string $typeA, string $typeB): void
+    {
+        $this->assertTrue((new Collection($typeA))->isEqualType(new Collection($typeB)));
+    }
+
+    /**
+     * @test
      *
      * @throws CollectionException
      * @return void

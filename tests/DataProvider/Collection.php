@@ -47,6 +47,155 @@ class Collection
     /**
      * @return array[]
      */
+    public function getStrictlyMatchingTypes(): array
+    {
+        // SIGNATURE: string $typeA, string $typeB
+
+        return [
+            ['int', 'int'],
+            ['integer', 'integer'],
+            ['integer', 'int'],
+            ['int', 'integer'],
+            ['string', 'string'],
+            ['boolean', 'boolean'],
+            ['bool', 'bool'],
+            ['bool', 'boolean'],
+            ['boolean', 'bool'],
+            ['float', 'float'],
+            ['float', 'double'],
+            ['float', 'number'],
+            ['double', 'double'],
+            ['double', 'number'],
+            ['double', 'float'],
+            ['number', 'number'],
+            ['number', 'double'],
+            ['number', 'float'],
+            ['array', 'array'],
+            ['object', 'object'],
+            [TestEntity::class , TestEntity::class],
+            [TestEntityBase::class, TestEntityBase::class],
+            [AbstractTestEntity::class, AbstractTestEntity::class],
+            [InterfaceTestEntity::class, InterfaceTestEntity::class]
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getNotMatchingTypes(): array
+    {
+        // SIGNATURE: string $typeA, string $typeB
+
+        return [
+            ['string', 'int'],
+            ['string', 'integer'],
+            ['string', 'bool'],
+            ['string', 'boolean'],
+            ['string', 'float'],
+            ['string', 'double'],
+            ['string', 'number'],
+            ['string', 'array'],
+            ['string', 'object'],
+
+            ['int', 'string'],
+            ['int', 'bool'],
+            ['int', 'boolean'],
+            ['int', 'float'],
+            ['int', 'double'],
+            ['int', 'number'],
+            ['int', 'array'],
+            ['int', 'object'],
+
+            ['integer', 'string'],
+            ['integer', 'bool'],
+            ['integer', 'boolean'],
+            ['integer', 'float'],
+            ['integer', 'double'],
+            ['integer', 'number'],
+            ['integer', 'array'],
+            ['integer', 'object'],
+
+            ['bool', 'string'],
+            ['bool', 'int'],
+            ['bool', 'integer'],
+            ['bool', 'float'],
+            ['bool', 'double'],
+            ['bool', 'number'],
+            ['bool', 'array'],
+            ['bool', 'object'],
+
+            ['boolean', 'string'],
+            ['boolean', 'int'],
+            ['boolean', 'integer'],
+            ['boolean', 'float'],
+            ['boolean', 'double'],
+            ['boolean', 'number'],
+            ['boolean', 'array'],
+            ['boolean', 'object'],
+
+            ['float', 'string'],
+            ['float', 'int'],
+            ['float', 'integer'],
+            ['float', 'bool'],
+            ['float', 'boolean'],
+            ['float', 'array'],
+            ['float', 'object'],
+
+            ['double', 'string'],
+            ['double', 'int'],
+            ['double', 'integer'],
+            ['double', 'bool'],
+            ['double', 'boolean'],
+            ['double', 'array'],
+            ['double', 'object'],
+
+            ['number', 'string'],
+            ['number', 'int'],
+            ['number', 'integer'],
+            ['number', 'bool'],
+            ['number', 'boolean'],
+            ['number', 'array'],
+            ['number', 'object'],
+
+            ['array', 'string'],
+            ['array', 'int'],
+            ['array', 'integer'],
+            ['array', 'bool'],
+            ['array', 'boolean'],
+            ['array', 'float'],
+            ['array', 'double'],
+            ['array', 'number'],
+            ['array', 'object'],
+
+            ['object', 'string'],
+            ['object', 'int'],
+            ['object', 'integer'],
+            ['object', 'bool'],
+            ['object', 'boolean'],
+            ['object', 'float'],
+            ['object', 'double'],
+            ['object', 'number'],
+            ['object', 'array'],
+
+            [InterfaceTestEntity::class, AbstractTestEntity::class],
+            [InterfaceTestEntity::class, TestEntityBase::class],
+            [InterfaceTestEntity::class, TestEntity::class],
+            [AbstractTestEntity::class, InterfaceTestEntity::class],
+            [AbstractTestEntity::class, TestEntityBase::class],
+            [AbstractTestEntity::class, TestEntity::class],
+            [TestEntityBase::class, InterfaceTestEntity::class],
+            [TestEntityBase::class, AbstractTestEntity::class],
+            [TestEntityBase::class, TestEntity::class],
+            [TestEntity::class, InterfaceTestEntity::class],
+            [TestEntity::class, AbstractTestEntity::class],
+            [TestEntity::class, TestEntityBase::class],
+
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
     public function getPrimitiveTypeWithInvalidData(): array
     {
         // SIGNATURE: string $type, array $invalidData, string $message
