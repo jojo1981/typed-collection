@@ -86,18 +86,6 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @deprecated use Collection::pushElement instead
-     *
-     * @param mixed $element
-     * @throws CollectionException
-     * @return void
-     */
-    public function addElement($element): void
-    {
-       $this->pushElement($element);
-    }
-
-    /**
      * Add an element to the begin (prepend) of this collection.
      *
      * @param mixed $element
@@ -158,18 +146,6 @@ class Collection implements \Countable, \IteratorAggregate
         $this->assertElementIsValid($element);
 
         return \in_array($element, $this->elements, true);
-    }
-
-    /**
-     * @deprecated use Collection::pushElements instead
-     *
-     * @param mixed[] $elements
-     * @throws CollectionException
-     * @return void
-     */
-    public function addElements(array $elements): void
-    {
-        $this->pushElements($elements);
     }
 
     /**
@@ -386,17 +362,6 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @deprecated Use Collection::for
-     *
-     * @param callable $predicate
-     * @return bool
-     */
-    public function forAll(callable $predicate): bool
-    {
-        return $this->all($predicate);
-    }
-
-    /**
      * Apply the predicate for all elements in this collection and return true when the predicate has returned true for all
      * elements or when this collection is empty. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
@@ -414,17 +379,6 @@ class Collection implements \Countable, \IteratorAggregate
         }
 
         return true;
-    }
-
-    /**
-     * @deprecated use Collection::some instead
-     *
-     * @param callable $predicate
-     * @return bool
-     */
-    public function exists(callable $predicate): bool
-    {
-        return $this->some($predicate);
     }
 
     /**
