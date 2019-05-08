@@ -128,6 +128,104 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEmptyShouldReturnTrueWhenTheCollectionIsEmpty(): void
+    {
+        $this->assertTrue((new Collection('string'))->isEmpty());
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEmptyShouldReturnFalseWhenTheCollectionIsNotEmpty(): void
+    {
+        $this->assertFalse((new Collection('string', ['item1']))->isEmpty());
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isNonEmptyShouldReturnFalseWhenTheCollectionIsNotEmpty(): void
+    {
+        $this->assertFalse((new Collection('string'))->isNonEmpty());
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isNonEmptyShouldReturnTrueWhenTheCollectionIsEmpty(): void
+    {
+        $this->assertTrue((new Collection('string', ['item1']))->isNonEmpty());
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function unshiftElementShouldAddAnElementToTheBeginOfTheCollection(): void
+    {
+        $collection = new Collection('string', ['item1', 'item2']);
+        $this->assertEquals(2, $collection->count());
+        $collection->unshiftElement('item3');
+        $this->assertEquals(3, $collection->count());
+
+        $expectedOrder = ['item3', 'item1', 'item2'];
+        $this->assertSame($expectedOrder, $collection->toArray());
+
+        foreach ($collection as $index => $item) {
+            $this->assertEquals($expectedOrder[$index], $item);
+        }
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function pushElementShouldAddAnElementToTheEndOfTheCollection(): void
+    {
+        $collection = new Collection('string', ['item1', 'item2']);
+        $this->assertEquals(2, $collection->count());
+        $collection->pushElement('item3');
+        $this->assertEquals(3, $collection->count());
+
+        $expectedOrder = ['item1', 'item2', 'item3'];
+        $this->assertSame($expectedOrder, $collection->toArray());
+
+        foreach ($collection as $index => $item) {
+            $this->assertEquals($expectedOrder[$index], $item);
+        }
+    }
+
+    /**
+     * @test
+     *
      * @throws CollectionException
      * @return void
      */
