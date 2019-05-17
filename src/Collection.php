@@ -349,16 +349,21 @@ class Collection implements \Countable, \IteratorAggregate
      * Merge other collection into this collection. Both collections should be exactly of the same type.
      *
      * @param Collection $otherCollection
+     * @param Collection ...$otherCollections
      * @throws CollectionException
      * @return void
      */
-    public function merge(Collection $otherCollection): void
+    public function merge(Collection $otherCollection, Collection ...$otherCollections): void
     {
-        if (!$this->type->match($otherCollection->type)) {
-            throw CollectionException::couldNotMergeCollection($this->type->getValue(), $otherCollection->getType());
-        }
+        \array_unshift($otherCollections, $otherCollection);
 
-        $this->elements = \array_merge($this->toArray(), $otherCollection->toArray());
+        foreach ($otherCollections as $currentOtherCollection) {
+            if (!$this->type->match($currentOtherCollection->type)) {
+                throw CollectionException::couldNotMergeCollection($this->type->getValue(), $otherCollection->getType());
+            }
+
+            $this->pushElements($currentOtherCollection->toArray());
+        }
     }
 
     /**
