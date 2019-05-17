@@ -177,6 +177,17 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
+     * @param mixed[] $elements
+     * @throws CollectionException
+     * @return void
+     */
+    public function setElements(array $elements): void
+    {
+        $this->clear();
+        $this->pushElements($elements);
+    }
+
+    /**
      * Remove the given element from this collection when it exists in this collection. When the element does not exists
      * in this collection a CollectionException will be thrown. Use Collection::hasElement to check if an element exist
      * in this collection.
