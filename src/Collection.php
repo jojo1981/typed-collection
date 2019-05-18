@@ -308,7 +308,7 @@ class Collection implements \Countable, \IteratorAggregate
      * Map this collection to a new collection of the given type.
      *
      * The mapper callback should accept 2 parameters at max. The first parameter should accept the same type as this
-     * collection has and the second parameter is optionally and must accept an integer. The return type of the callback
+     * collection has and the second parameter is optionally and must accept an integer. The return type of the mapper
      * should be the same type as the type given for the new collection to be returned.
      *
      * @param string $type
@@ -336,8 +336,8 @@ class Collection implements \Countable, \IteratorAggregate
      * Flat map this collection to a new collection of the given type.
      *
      * The mapper callback should accept 2 parameters at max. The first parameter should accept the same type as this
-     * collection has and the second parameter is optionally and must accept an integer. The return type of the callback
-     * should be an array. The returned value for the callback should be an empty array or an array with elements of the
+     * collection has and the second parameter is optionally and must accept an integer. The return type of the mapper
+     * should be an array. The returned value for the mapper should be an empty array or an array with elements of the
      * same type as the type given for the new collection to be returned.
      *
      * @param string $type
@@ -381,7 +381,7 @@ class Collection implements \Countable, \IteratorAggregate
      * Apply the predicate for all elements in this collection and return true when the predicate has returned true for all
      * elements or when this collection is empty. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
-     * must accept an integer. The return type of the callback should be a boolean.
+     * must accept an integer. The return type of the predicate should be a boolean.
      *
      * @param callable $predicate
      * @return bool
@@ -402,7 +402,7 @@ class Collection implements \Countable, \IteratorAggregate
      * element. When this collection is empty false will be returned. As soon as the predicate has returned true the
      * iteration will be stopped and true will be returned. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
-     * must accept an integer. The return type of the callback should be a boolean.
+     * must accept an integer. The return type of the predicate should be a boolean.
      *
      * @param callable $predicate
      * @return bool
@@ -423,7 +423,7 @@ class Collection implements \Countable, \IteratorAggregate
      * elements or when this collection is empty. As soon as the predicate has returned true the iteration will be
      * stopped and false will be returned. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
-     * must accept an integer. The return type of the callback should be a boolean.
+     * must accept an integer. The return type of the predicate should be a boolean.
      *
      * @param callable $predicate
      * @return bool
@@ -440,11 +440,66 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
+     * For each element the callback will be invoked. The callback should accept 2 parameters at max.
+     * The first parameter should accept the same type as this collection has and the second parameter is optionally and
+     * must accept an integer. The return type of the callback should be void.
+     *
+     * @param callable $callback
+     * @return void
+     */
+    public function forEach(callable $callback): void
+    {
+        foreach ($this->elements as $index => $element) {
+            $callback($element, $index);
+        }
+    }
+
+    /**
+     * Will fold to collection from the left side into 1 single value. The callback should accept 3 parameters
+     * at max. The first parameter type should match the result type and/or initial value, The second parameter should
+     * accept the same type as this collection has and the third parameter is optionally and must accept an integer.
+     * The return type of the callback should be the same type as the first parameter.
+     *
+     * @param callable $callback
+     * @param null|mixed $initial
+     * @return mixed
+     */
+    public function foldLeft(callable $callback, $initial = null)
+    {
+        $result = $initial;
+        foreach ($this->elements as $index => $element) {
+            $result = $callback($result, $element, $index);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Will fold to collection from the right side into 1 single value. The callback should accept 3 parameters
+     * at max. The first parameter type should match the result type and/or initial value, The second parameter should
+     * accept the same type as this collection has and the third parameter is optionally and must accept an integer.
+     * The return type of the callback should be the same type as the first parameter.
+     *
+     * @param callable $callback
+     * @param null|mixed $initial
+     * @return mixed
+     */
+    public function foldRight(callable $callback, $initial = null)
+    {
+        $result = $initial;
+        foreach (\array_reverse($this->elements) as $index => $element) {
+            $result = $callback($result, $element, $index);
+        }
+
+        return $result;
+    }
+
+    /**
      * Filter this collection and return a new collection of the same type as this collection with the filtered elements.
      * Apply the predicate for all elements in this collection and when the predicate returns true the elements will be
      * added to the new collection. When the predicate never matches an empty collection will be the result.
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
-     * collection has and the second parameter is optionally and must accept an integer. The return type of the callback
+     * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
      * should be a boolean.
      *
      * @param callable $predicate
@@ -462,7 +517,7 @@ class Collection implements \Countable, \IteratorAggregate
      * returned. This collection will be untouched and is not mutated.
      * As soon as the predicate has returned true the iteration will be stopped and the element will be returned.
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
-     * collection has and the second parameter is optionally and must accept an integer. The return type of the callback
+     * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
      * should be a boolean.
      *
      * @param callable $predicate
@@ -487,7 +542,7 @@ class Collection implements \Countable, \IteratorAggregate
      * Return Collection.
      *
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
-     * collection has and the second parameter is optionally and must accept an integer. The return type of the callback
+     * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
      * should be a boolean.
      *
      * @param callable $predicate
@@ -527,7 +582,7 @@ class Collection implements \Countable, \IteratorAggregate
      * matches by the predicate. The second collection element has all not matched elements.
      *
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
-     * collection has and the second parameter is optionally and must accept an integer. The return type of the callback
+     * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
      * should be a boolean.
      *
      * @param callable $predicate
