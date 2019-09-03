@@ -135,7 +135,8 @@ class Collection implements \Countable, \IteratorAggregate
 
     /**
      * Check if this collection contains the given element. This will be done by strict comparision.
-     * When this collection contains objects the comparision will be done by reference.
+     * When this collection contains objects the comparision will be done by reference. Use `some` when you need to
+     * check if there is an element which matches a custom predicate.
      *
      * @param mixed $element
      * @throws CollectionException
@@ -285,12 +286,12 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function toArray(): array
     {
-        return $this->elements;
+        return \array_values($this->elements);
     }
 
     /**
-     * Sort this collection using the passed comparator callback. The comparator callback should accept a parameters 2
-     * parameters which a matching the type of this collection and the callback should return an integer higher than,
+     * Sort this collection using the passed comparator callback. The comparator callback should accept 2 parameters
+     * which are matching the type of this collection and the callback should return an integer higher than,
      * less than or equal to zero.
      *
      * @param callable $comparator
@@ -670,6 +671,106 @@ class Collection implements \Countable, \IteratorAggregate
     public function getIterator(): CollectionIterator
     {
         return new CollectionIterator(new \ArrayIterator($this->elements));
+    }
+
+    /**
+     * Check whether the passed collection is equal to this collection. When $strict is true also the order of elements
+     * needs to be the same. A collection is considered to be equal when both collections are of the same type, have the
+     * same count and all elements from this collection can be found in the passed Collection. To determine if 2 elements
+     * should be considered equal the predicate function will be invoked.
+     * The predicate function must accept 2 arguments of the same type this collection and should return a boolean value.
+     * When the predicate function is omitted the default comparison will be strictly equals (=== comparison operator will
+     * be used).
+     *
+     * @param Collection $otherCollection
+     * @param null|callable $predicate
+     * @param bool $strict
+     * @return bool
+     */
+    public function isEqualCollection(Collection $otherCollection, ?callable $predicate = null, bool $strict = false): bool
+    {
+        $predicate = $predicate ?? static function ($left, $right): bool {
+            return $left === $right;
+        };
+
+        return $strict ? $this->isEqualCollectionOrdered($otherCollection, $predicate)
+            : $this->isEqualCollectionUnordered($otherCollection, $predicate);
+    }
+
+    /**
+     * Compare if this collection and the passed collection are equal. The collections are considered equal when all
+     * elements of this collection are found in the passed collection in the same order. The predicate callback is used
+     * to determine if 2 elements should be considered equal.
+     *
+     * @param Collection $otherCollection
+     * @param callable $predicate
+     * @return bool
+     */
+    private function isEqualCollectionOrdered(Collection $otherCollection, callable $predicate): bool
+    {
+        if ($this->isNotEqualTypeOrHaveDifferentSize($otherCollection)) {
+            return false;
+        }
+        if ($this->isEmpty()) {
+            return true;
+        }
+
+        $otherElements = $otherCollection->toArray();
+        foreach ($this->toArray() as $index => $element) {
+            if (false === $predicate($element, $otherElements[$index])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Compare if this collection and the passed collection are equal. The collections are considered equal when all
+     * elements of this collection are found in the passed collection not necessary in the same order. The predicate
+     * callback is used to determine if 2 elements should be considered equal.
+     *
+     * @param Collection $otherCollection
+     * @param callable $predicate
+     * @return bool
+     */
+    private function isEqualCollectionUnordered(Collection $otherCollection, callable $predicate): bool
+    {
+        if ($this->isNotEqualTypeOrHaveDifferentSize($otherCollection)) {
+            return false;
+        }
+        if ($this->isEmpty()) {
+            return true;
+        }
+
+        $leftElements = $this->toArray();
+        $rightElements = $otherCollection->toArray();
+        while (!empty($leftElements)) {
+            $leftElement = \array_pop($leftElements);
+            $found = false;
+            foreach ($rightElements as $index => $rightElement) {
+                if (true === $predicate($leftElement, $rightElement)) {
+                    unset($rightElements[$index]);
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (false === $found) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Collection $otherCollection
+     * @return bool
+     */
+    private function isNotEqualTypeOrHaveDifferentSize(Collection $otherCollection): bool
+    {
+        return !$this->isEqualType($otherCollection) || $this->count() !== $otherCollection->count();
     }
 
     /**

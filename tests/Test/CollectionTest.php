@@ -319,4 +319,254 @@ class CollectionTest extends TestCase
 
         $this->assertEquals($expectedResult, $actualResult);
     }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnFalseWhenCollectionTypesDoNotMatch(): void
+    {
+        $collection1 = new Collection('string');
+        $collection2 = new Collection('integer');
+        $predicate = function ($elementA, $elementB): bool {
+            $this->fail('Predicate callback should not be invoked');
+
+            return true;
+        };
+
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate, true));
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate, true));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnFalseWhenCollectionTypesAreMatchingButCountIsNotTheSame(): void
+    {
+        $collection1 = new Collection('string', ['a', 'b']);
+        $collection2 = new Collection('string', ['a']);
+        $predicate = function ($elementA, $elementB): bool {
+            $this->fail('Predicate callback should not be invoked');
+
+            return true;
+        };
+
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate, true));
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate, true));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnFalseWhenCollectionTypesAreMatchingCountIsTheSameButNotAllElementAreEqual(): void
+    {
+        $collection1 = new Collection('string', ['a', 'b', 'c']);
+        $collection2 = new Collection('string', ['a', 'b', 'd']);
+        $predicate = static function ($elementA, $elementB): bool {
+            return $elementA === $elementB;
+        };
+
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate, true));
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate, true));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnTrueWhenCollectionTypesAreMatchingAndCollectionsAreEmpty(): void
+    {
+        $collection1 = new Collection('string');
+        $collection2 = new Collection('string');
+        $predicate = function ($elementA, $elementB): bool {
+            $this->fail('Predicate callback should not be invoked');
+
+            return true;
+        };
+
+        $this->assertTrue($collection1->isEqualCollection($collection2, $predicate, true));
+        $this->assertTrue($collection1->isEqualCollection($collection2, $predicate));
+        $this->assertTrue($collection2->isEqualCollection($collection1, $predicate, true));
+        $this->assertTrue($collection2->isEqualCollection($collection1, $predicate));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnFalseWhenStrictIsTrueAndElementsAreMatchingButNotInSameOrder(): void
+    {
+        $collection1 = new Collection('string', ['a', 'c', 'b']);
+        $collection2 = new Collection('string', ['a', 'b', 'c']);
+        $predicate = static function ($elementA, $elementB): bool {
+            return $elementA === $elementB;
+        };
+
+        $this->assertFalse($collection1->isEqualCollection($collection2, $predicate, true));
+        $this->assertFalse($collection2->isEqualCollection($collection1, $predicate, true));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnTrueWhenStrictIsTrueAndElementsAreMatchingAndInSameOrder(): void
+    {
+        $collection1 = new Collection('string', ['a', 'c', 'b']);
+        $collection2 = new Collection('string', ['a', 'c', 'b']);
+        $predicate = static function ($elementA, $elementB): bool {
+            return $elementA === $elementB;
+        };
+
+        $this->assertTrue($collection1->isEqualCollection($collection2, $predicate, true));
+        $this->assertTrue($collection2->isEqualCollection($collection1, $predicate, true));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnTrueWhenStrictIsFalseAndElementsAreMatchingButNotInSameOrder(): void
+    {
+        $collection1 = new Collection('string', ['a', 'c', 'b']);
+        $collection2 = new Collection('string', ['a', 'b', 'c']);
+        $predicate = static function ($elementA, $elementB): bool {
+            return $elementA === $elementB;
+        };
+
+        $this->assertTrue($collection1->isEqualCollection($collection2, $predicate));
+        $this->assertTrue($collection2->isEqualCollection($collection1, $predicate));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnFalseWhenNoPredicateIsGivenAndCollectionsAreNotEqual(): void
+    {
+        $collection1 = new Collection('string', ['a', 'c', 'b']);
+        $collection2 = new Collection('string', ['a', 'b', 'd']);
+
+        $this->assertFalse($collection1->isEqualCollection($collection2));
+        $this->assertFalse($collection1->isEqualCollection($collection2, null, true));
+        $this->assertFalse($collection2->isEqualCollection($collection1));
+        $this->assertFalse($collection2->isEqualCollection($collection1, null, true));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnTrueWhenNoPredicateIsGivenAndCollectionsAreEqual(): void
+    {
+        $collection1 = new Collection('string', ['a', 'b', 'c']);
+        $collection2 = new Collection('string', ['a', 'b', 'c']);
+
+        $this->assertTrue($collection1->isEqualCollection($collection2));
+        $this->assertTrue($collection1->isEqualCollection($collection2, null, true));
+        $this->assertTrue($collection2->isEqualCollection($collection1));
+        $this->assertTrue($collection2->isEqualCollection($collection1, null, true));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnCorrectResultWhenNoPredicateIsGivenAndCollectionsAreUnorderedEqual(): void
+    {
+        $collection1 = new Collection('string', ['a', 'b', 'c']);
+        $collection2 = new Collection('string', ['a', 'c', 'b']);
+
+        $this->assertTrue($collection1->isEqualCollection($collection2));
+        $this->assertFalse($collection1->isEqualCollection($collection2, null, true));
+        $this->assertTrue($collection2->isEqualCollection($collection1));
+        $this->assertFalse($collection2->isEqualCollection($collection1, null, true));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnFalseWhenNoPredicateIsGivenAndCollectionsAreNotEqualBecauseOfStrictlyEqualsComparision(): void
+    {
+        $collection1 = new Collection(\stdClass::class, [new \stdClass()]);
+        $collection2 = new Collection(\stdClass::class, [new \stdClass()]);
+
+        $this->assertFalse($collection1->isEqualCollection($collection2));
+        $this->assertFalse($collection1->isEqualCollection($collection2, null, true));
+        $this->assertFalse($collection2->isEqualCollection($collection1));
+        $this->assertFalse($collection2->isEqualCollection($collection1, null, true));
+    }
+
+    /**
+     * @test
+     *
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws CollectionException
+     * @return void
+     */
+    public function isEqualCollectionShouldReturnTrueWhenNoPredicateIsGivenAndCollectionsAreEqualEvenWithStrictlyEqualsComparision(): void
+    {
+        $element = new \stdClass();
+        $collection2 = new Collection(\stdClass::class, [$element]);
+        $collection1 = new Collection(\stdClass::class, [$element]);
+
+        $this->assertTrue($collection1->isEqualCollection($collection2));
+        $this->assertTrue($collection1->isEqualCollection($collection2, null, true));
+        $this->assertTrue($collection2->isEqualCollection($collection1));
+        $this->assertTrue($collection2->isEqualCollection($collection1, null, true));
+    }
 }
