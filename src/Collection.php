@@ -296,13 +296,16 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param callable $comparator
      * @throws CollectionException
-     * @return void
+     * @return Collection
      */
-    public function sortBy(callable $comparator): void
+    public function sortBy(callable $comparator): Collection
     {
-        if (false === \usort($this->elements, $comparator)) {
+        $elements = $this->elements;
+        if (false === \usort($elements, $comparator)) {
             throw new CollectionException('Could not sort the collection');
         }
+
+        return new Collection($this->getType(), $elements);
     }
 
     /**
