@@ -459,7 +459,7 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Will fold to collection from the left side into 1 single value. The callback should accept 3 parameters
+     * Will fold the collection from the left side into 1 single value. The callback should accept 3 parameters
      * at max. The first parameter type should match the result type and/or initial value, The second parameter should
      * accept the same type as this collection has and the third parameter is optionally and must accept an integer.
      * The return type of the callback should be the same type as the first parameter.
@@ -479,7 +479,7 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Will fold to collection from the right side into 1 single value. The callback should accept 3 parameters
+     * Will fold the collection from the right side into 1 single value. The callback should accept 3 parameters
      * at max. The first parameter type should match the result type and/or initial value, The second parameter should
      * accept the same type as this collection has and the third parameter is optionally and must accept an integer.
      * The return type of the callback should be the same type as the first parameter.
