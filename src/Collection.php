@@ -352,12 +352,16 @@ class Collection implements \Countable, \IteratorAggregate
     public function flatMap(string $type, callable $mapper): Collection
     {
         static::assertType($type);
-        $result = [];
+        $results = [];
         foreach ($this->elements as $index => $value) {
-            \array_push($result, ...$mapper($value, $index));
+            $mapperResult = $mapper($value, $index);
+            $values = !\is_array($mapperResult) ? [$mapperResult] : \array_values($mapperResult);
+            if (!empty($values)) {
+                \array_push($results, ...$values);
+            }
         }
 
-        return new Collection($type, $result);
+        return new Collection($type, $results);
     }
 
     /**
