@@ -227,6 +227,20 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns a new Collection with all elements in reverse order.
+     *
+     * @throws CollectionException
+     * @return Collection
+     */
+    public function reverse(): Collection
+    {
+        return new Collection(
+            $this->type->getValue(),
+            \array_reverse($this->elements)
+        );
+    }
+
+    /**
      * Get an element by the given index. Returns the element or null when the given index does not exists in this
      * collection.
      *
