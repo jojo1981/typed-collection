@@ -17,12 +17,13 @@
     }
   ],
   "minimum-stability": "dev",
+  "prefer-stable": true,
   "require": {
     "php": "^7.1"
   },
   "require-dev": {
-    "php-coveralls/php-coveralls": "2.1.x-dev",
-    "phpunit/phpunit": "7.5.x-dev"
+    "php-coveralls/php-coveralls": "^2.2",
+    "phpunit/phpunit": "^7.5"
   },
   "suggest": {
     "jms/serializer": "Library for (de-)serializing data of any complexity; supports XML, JSON, and YAML.",
