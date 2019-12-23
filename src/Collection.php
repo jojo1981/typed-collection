@@ -234,10 +234,106 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function reverse(): Collection
     {
-        return new Collection(
-            $this->type->getValue(),
-            \array_reverse($this->elements)
-        );
+        return new Collection($this->type->getValue(), \array_reverse($this->elements));
+    }
+
+    /**
+     * Returns a new Collection by omitting the given number of elements from the beginning.
+     * If the passed number is greater than the available number of elements, all will be removed.
+     *
+     * @param int $number
+     * @throws CollectionException
+     * @throws \InvalidArgumentException
+     * @return Collection
+     */
+    public function drop(int $number): Collection
+    {
+        if ($number <= 0) {
+            throw new \InvalidArgumentException(\sprintf('The number must be greater than 0, but got %d.', $number));
+        }
+
+        return new Collection($this->type->getValue(), \array_slice($this->elements, $number));
+    }
+
+    /**
+     * Returns a new Collection by omitting the given number of elements from the end.
+     * If the passed number is greater than the available number of elements, all will be removed.
+     *
+     * @param int $number
+     * @throws \InvalidArgumentException
+     * @throws CollectionException
+     * @return Collection
+     */
+    public function dropRight(int $number): Collection
+    {
+        if ($number <= 0) {
+            throw new \InvalidArgumentException(sprintf('The number must be greater than 0, but got %d.', $number));
+        }
+
+        return new Collection($this->type->getValue(), \array_slice($this->elements, 0, -1 * $number));
+    }
+
+    /**
+     * Returns a new Collection by omitting elements from the beginning for as long as the callable returns true.
+     * The callback function receives the element to drop as first argument, and returns true (drop), or false (stop).
+     *
+     * @param callable $callback
+     * @throws CollectionException
+     * @return Collection
+     */
+    public function dropWhile(callable $callback): Collection
+    {
+        $countElements = $this->count();
+        for ($currentIndex = 0; $currentIndex < $countElements; $currentIndex++) {
+            if (true !== $callback($this->elements[$currentIndex])) {
+                break;
+            }
+        }
+
+        return new Collection($this->type->getValue(), \array_slice($this->elements, $currentIndex));
+    }
+
+    /**
+     * Creates a new Collection by taking the given number of elements from the beginning
+     * of the current Collection.
+     *
+     * If the passed number is greater than the available number of elements, then all elements
+     * will be returned as a new collection.
+     *
+     * @param int $number
+     * @throws \InvalidArgumentException
+     * @throws CollectionException
+     * @return Collection
+     */
+    public function take(int $number): Collection
+    {
+        if ($number <= 0) {
+            throw new \InvalidArgumentException(sprintf('$number must be greater than 0, but got %d.', $number));
+        }
+
+        return new Collection($this->type->getValue(), \array_slice($this->elements, 0, $number));
+    }
+
+    /**
+     * Creates a new Collection by taking elements from the current Collection
+     * for as long as the callable returns true.
+     *
+     * @param callable $callable
+     * @throws CollectionException
+     * @return Collection
+     */
+    public function takeWhile(callable $callable): Collection
+    {
+        $newElements = [];
+        $countElements = $this->count();
+        for ($currentIndex = 0; $currentIndex < $countElements; $currentIndex++) {
+            if (true !== $callable($this->elements[$currentIndex])) {
+                break;
+            }
+            $newElements[] = $this->elements[$currentIndex];
+        }
+
+        return new Collection($this->type->getValue(), $newElements);
     }
 
     /**
