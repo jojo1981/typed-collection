@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/typed-collection package
  *
@@ -25,27 +25,29 @@ class CollectionTest extends TestCase
 {
     /**
      * @test
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getInvalidTypes()
      *
-     * @throws CollectionException
+     * @param string $invalidType
      * @return void
+     *@throws CollectionException
      */
-    public function constructWithInvalidTypeShouldThrowCollectionException(): void
+    public function constructWithInvalidTypeShouldThrowCollectionException(string $invalidType): void
     {
         $this->expectExceptionObject(new CollectionException(
-            'Given type: `invalid-type` is not a valid primitive type and also not an existing class'
+            'Given type: `' . $invalidType . '` is not a valid primitive type and also not an existing class'
         ));
-        new Collection('invalid-type');
+        new Collection($invalidType);
     }
 
     /**
      * @test
-     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getPrimitiveTypeWithInvalidData
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getPrimitiveTypeWithInvalidData
      *
      * @param string $type
      * @param mixed[] $invalidData
      * @param string $message
-     * @throws CollectionException
      * @return void
+     *@throws CollectionException
      */
     public function constructWithValidPrimitiveTypeButInvalidElementShouldThrowCollectionException(
         string $type,
@@ -59,13 +61,13 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getClassNameTypeWithInvalidData
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getClassNameTypeWithInvalidData
      *
      * @param string $type
      * @param mixed[] $invalidData
      * @param string $message
-     * @throws CollectionException
      * @return void
+     *@throws CollectionException
      */
     public function constructWithValidClassNameTypeButInvalidElementShouldThrowCollectionException(
         string $type,
@@ -79,14 +81,14 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getValidTypesMap
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getValidTypesMap
      *
      * @param string $type
      * @param string $expectedType
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @throws CollectionException
      * @return void
+     *@throws InvalidArgumentException
+     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function getTypeShouldReturnTheCorrectType(string $type, string $expectedType): void
     {
@@ -95,14 +97,14 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getNotMatchingTypes
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getNotMatchingTypes
      *
      * @param string $typeA
      * @param string $typeB
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @throws CollectionException
      * @return void
+     *@throws InvalidArgumentException
+     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function isEqualTypeShouldReturnFalseWhenTypeNotStrictlyMatches(string $typeA, string $typeB): void
     {
@@ -111,14 +113,14 @@ class CollectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\Collection::getStrictlyMatchingTypes
+     * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getStrictlyMatchingTypes
      *
      * @param string $typeA
      * @param string $typeB
-     * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
-     * @throws CollectionException
      * @return void
+     *@throws InvalidArgumentException
+     * @throws CollectionException
+     * @throws ExpectationFailedException
      */
     public function isEqualTypeShouldReturnTrueWhenTypeStrictlyMatches(string $typeA, string $typeB): void
     {
@@ -282,7 +284,7 @@ class CollectionTest extends TestCase
     public function createFromCollectionsShouldThrowCollectionExceptionBecauseNotAllCollectionAreOfTheExpectedType(): void
     {
         $this->expectExceptionObject(new CollectionException(
-            'Expect every collection to be of type: `string`. Collection found with type: `integer`'
+            'Expect every collection to be of type: `string`. Collection found with type: `int`'
         ));
         Collection::createFromCollections('string', [new Collection('string'), new Collection('int')]);
     }

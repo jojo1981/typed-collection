@@ -19,7 +19,8 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^7.1"
+    "php": "^7.1",
+    "jojo1981/php-types": "^1.0"
   },
   "require-dev": {
     "php-coveralls/php-coveralls": "^2.2",
@@ -32,6 +33,11 @@
   "autoload": {
     "psr-4": {
       "Jojo1981\\TypedCollection\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Jojo1981\\TypedCollection\\TestSuite\\": "tests/"
     }
   },
   "config": {

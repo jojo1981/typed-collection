@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/typed-collection package
  *
@@ -9,9 +9,11 @@
  */
 namespace Jojo1981\TypedCollection;
 
+use Jojo1981\PhpTypes\AbstractType;
+use Jojo1981\PhpTypes\ClassType;
+use Jojo1981\PhpTypes\Exception\TypeException;
+use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedCollection\Exception\CollectionException;
-use Jojo1981\TypedCollection\Value\Type\AbstractTypeValue;
-use Jojo1981\TypedCollection\Value\Type\TypeValueInterface;
 
 /**
  * This is a mutable collection and is a wrapper around an indexed array and can only hold elements of the same type.
@@ -22,7 +24,7 @@ use Jojo1981\TypedCollection\Value\Type\TypeValueInterface;
  */
 class Collection implements \Countable, \IteratorAggregate
 {
-    /** @var TypeValueInterface */
+    /** @var TypeInterface */
     private $type;
 
     /** @var mixed[] */
@@ -39,7 +41,7 @@ class Collection implements \Countable, \IteratorAggregate
     public function __construct(string $type, array $elements = [])
     {
         static::assertType($type);
-        $this->type = AbstractTypeValue::createTypeValueInstance($type);
+        $this->type = self::createTypeFromName($type);
         $this->pushElements($elements);
     }
 
@@ -50,7 +52,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function getType(): string
     {
-        return $this->type->getValue();
+        return $this->type->getName();
     }
 
     /**
@@ -234,7 +236,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function reverse(): Collection
     {
-        return new Collection($this->type->getValue(), \array_reverse($this->elements));
+        return new Collection($this->type->getName(), \array_reverse($this->elements));
     }
 
     /**
@@ -252,7 +254,7 @@ class Collection implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException(\sprintf('The number must be greater than 0, but got %d.', $number));
         }
 
-        return new Collection($this->type->getValue(), \array_slice($this->elements, $number));
+        return new Collection($this->type->getName(), \array_slice($this->elements, $number));
     }
 
     /**
@@ -270,7 +272,7 @@ class Collection implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException(sprintf('The number must be greater than 0, but got %d.', $number));
         }
 
-        return new Collection($this->type->getValue(), \array_slice($this->elements, 0, -1 * $number));
+        return new Collection($this->type->getName(), \array_slice($this->elements, 0, -1 * $number));
     }
 
     /**
@@ -290,7 +292,7 @@ class Collection implements \Countable, \IteratorAggregate
             }
         }
 
-        return new Collection($this->type->getValue(), \array_slice($this->elements, $currentIndex));
+        return new Collection($this->type->getName(), \array_slice($this->elements, $currentIndex));
     }
 
     /**
@@ -311,7 +313,7 @@ class Collection implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException(sprintf('$number must be greater than 0, but got %d.', $number));
         }
 
-        return new Collection($this->type->getValue(), \array_slice($this->elements, 0, $number));
+        return new Collection($this->type->getName(), \array_slice($this->elements, 0, $number));
     }
 
     /**
@@ -333,7 +335,7 @@ class Collection implements \Countable, \IteratorAggregate
             $newElements[] = $this->elements[$currentIndex];
         }
 
-        return new Collection($this->type->getValue(), $newElements);
+        return new Collection($this->type->getName(), $newElements);
     }
 
     /**
@@ -384,7 +386,7 @@ class Collection implements \Countable, \IteratorAggregate
         $firstElement = $this->getFirstElement();
 
         return new Collection(
-            $this->type->getValue(),
+            $this->type->getName(),
             $firstElement ? [$firstElement] : []
         );
     }
@@ -487,8 +489,8 @@ class Collection implements \Countable, \IteratorAggregate
         \array_unshift($otherCollections, $otherCollection);
 
         foreach ($otherCollections as $currentOtherCollection) {
-            if (!$this->type->match($currentOtherCollection->type)) {
-                throw CollectionException::couldNotMergeCollection($this->type->getValue(), $otherCollection->getType());
+            if (!$this->type->isAssignableType($currentOtherCollection->type)) {
+                throw CollectionException::couldNotMergeCollection($this->type->getName(), $otherCollection->getType());
             }
 
             $this->pushElements($currentOtherCollection->toArray());
@@ -626,7 +628,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function filter(callable $predicate): Collection
     {
-        return new Collection($this->type->getValue(), \array_filter($this->elements, $predicate, ARRAY_FILTER_USE_BOTH));
+        return new Collection($this->type->getName(), \array_filter($this->elements, $predicate, ARRAY_FILTER_USE_BOTH));
     }
 
     /**
@@ -901,10 +903,10 @@ class Collection implements \Countable, \IteratorAggregate
     public static function createFromCollections(string $type, array $collections): Collection
     {
         static::assertType($type);
-        $typeValue = AbstractTypeValue::createTypeValueInstance($type);
+        $typeValue = self::createTypeFromName($type);
         self::assertCollections($collections, $typeValue);
 
-        $result = new Collection($typeValue->getValue());
+        $result = new Collection($typeValue->getName());
         foreach ($collections as $collection) {
             $result->merge($collection);
         }
@@ -919,9 +921,15 @@ class Collection implements \Countable, \IteratorAggregate
      */
     private function assertElementIsValid($element): void
     {
-        $validationResult = $this->type->isValidData($element);
-        if (false === $validationResult->isValid()) {
-            throw new CollectionException($validationResult->getMessage());
+        if (!$this->type->isAssignableValue($element)) {
+            $otherType = self::createTypeFromValue($element);
+            throw new CollectionException(\sprintf(
+                'Data is not %s: `%s`, but %s: `%s`',
+                $this->type instanceof ClassType ? 'an instance of' : 'of expected type',
+                $this->type->getName(),
+                $otherType instanceof ClassType ? 'an instance of' : 'of type',
+                $otherType->getName()
+            ));
         }
     }
 
@@ -936,7 +944,7 @@ class Collection implements \Countable, \IteratorAggregate
             __CLASS__,
             \array_map(
                 function (array $elements): Collection {
-                    return new Collection($this->type->getValue(), $elements);
+                    return new Collection($this->type->getName(), $elements);
                 },
                 $collectionArrays
             )
@@ -945,11 +953,11 @@ class Collection implements \Countable, \IteratorAggregate
 
     /**
      * @param Collection[] $collections
-     * @param TypeValueInterface $typeValue
+     * @param TypeInterface $typeValue
      * @throws CollectionException
      * @return void
      */
-    private static function assertCollections(array $collections, TypeValueInterface $typeValue): void
+    private static function assertCollections(array $collections, TypeInterface $typeValue): void
     {
         if (empty($collections)) {
             throw new CollectionException('An empty array with typed collections passed');
@@ -961,11 +969,11 @@ class Collection implements \Countable, \IteratorAggregate
             if (!$collection instanceof self) {
                 throw new CollectionException('Expect $collections array to contain instances of Collection');
             }
-            if (!$typeValue->match($collection->type)) {
+            if (!$typeValue->isAssignableType($collection->type)) {
                 throw new CollectionException(\sprintf(
                     'Expect every collection to be of type: `%s`. Collection found with type: `%s`',
-                    $typeValue->getValue(),
-                    $collection->type->getValue()
+                    $typeValue->getName(),
+                    $collection->type->getName()
                 ));
             }
         }
@@ -978,8 +986,52 @@ class Collection implements \Countable, \IteratorAggregate
      */
     private static function assertType(string $type): void
     {
-        if (!AbstractTypeValue::isValidValue($type)) {
+        if (\in_array(\strtolower($type), ['mixed', 'null', 'void'])) {
             throw CollectionException::typeIsNotValid($type);
+        }
+
+        self::createTypeFromName($type);
+    }
+
+    /**
+     * @param array $elements
+     * @return Collection
+     * @throws CollectionException
+     */
+    public static function createFromElements(array $elements): Collection
+    {
+        if (empty($elements)) {
+            throw CollectionException::emptyElementsCanNotDetermineType();
+        }
+
+        return new self((self::createTypeFromValue(\reset($elements)))->getName(), $elements);
+    }
+
+    /**
+     * @param mixed $value
+     * @throws CollectionException
+     * @return TypeInterface
+     */
+    private static function createTypeFromValue($value): TypeInterface
+    {
+        try {
+            return AbstractType::createFromValue($value);
+        } catch (TypeException $exception) {
+            throw CollectionException::couldNotCreateTypeFromValue($exception);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @throws CollectionException
+     * @return TypeInterface
+     */
+    private static function createTypeFromName(string $name): TypeInterface
+    {
+        try {
+            return AbstractType::createFromTypeName($name);
+        } catch (TypeException $exception) {
+            throw CollectionException::typeIsNotValid($name, $exception);
         }
     }
 }

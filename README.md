@@ -13,17 +13,19 @@ The typed collection is an ordered mutable sequence.
 
 It is a data structure which is in fact a wrapper around an indexed array.  
 When a new collection is created the `type` for the collection *MUST* be given. 
-The collection is of a certain `type` and will guarantee all elements in teh collection are of the same `type`.  
+The collection is of a certain `type` and will guarantee all elements in the collection are of the same `type`.  
 The *type* can be a **primitive** `type` or a **class**/**interface** `type` set for the collection.
 
-Available primitive types are:
+Available types are:
 
-- bool (alias boolean)
 - int (alias integer),
-- float (aliases double or number)
-- string
+- float (aliases real, double or number)
+- string (alias text)
 - array
 - object
+- callable (alias callback)
+- iterable
+- class (class or interface name)
 
 The `\Jojo1981\TypedCollection\Collection` class is countable and is traversable (iterable).
 The collection has the following convenient instance methods:
@@ -67,7 +69,7 @@ The collection has the following convenient instance methods:
 - getIterator(): CollectionIterator
 - isEqualCollection(Collection $otherCollection, ?callable $predicate = null, bool $strict = false): bool
 
-The `\Jojo1981\TypedCollection\Collection` has static method `createFromCollections`.   
+The `\Jojo1981\TypedCollection\Collection` has a static method `createFromCollections`.   
 Multiple collection of the same `type` can be merged together into one collection.
  
 ## Installation

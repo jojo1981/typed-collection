@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/typed-collection package
  *
@@ -20,11 +20,16 @@ class CollectionException extends \DomainException
 {
     /**
      * @param string $type
+     * @param null|\Exception $previous
      * @return CollectionException
      */
-    public static function typeIsNotValid(string $type): CollectionException
+    public static function typeIsNotValid(string $type, ?\Exception $previous = null): CollectionException
     {
-        return new self('Given type: `' . $type . '` is not a valid primitive type and also not an existing class');
+        return new self(
+            'Given type: `' . $type . '` is not a valid primitive type and also not an existing class',
+            0,
+            $previous
+        );
     }
 
     /**
@@ -40,5 +45,22 @@ class CollectionException extends \DomainException
             $type,
             $otherType
         ));
+    }
+
+    /**
+     * @return CollectionException
+     */
+    public static function emptyElementsCanNotDetermineType(): CollectionException
+    {
+        return new self('Elements can not be empty, because type can NOT be determined');
+    }
+
+    /**
+     * @param \Exception $previous
+     * @return CollectionException
+     */
+    public static function couldNotCreateTypeFromValue(\Exception $previous): CollectionException
+    {
+        return new self('Could not create type from value', 0, $previous);
     }
 }

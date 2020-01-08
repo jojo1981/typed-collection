@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the jojo1981/typed-collection package
  *
@@ -28,12 +28,13 @@ class CollectionExceptionTest extends TestCase
      */
     public function typeIsNotValidShouldReturnCollectionException(): void
     {
-        $exception = CollectionException::typeIsNotValid('invalidType');
-
+        $previous = new \Exception('Previous exception');
+        $exception = CollectionException::typeIsNotValid('invalidType', $previous);
         $this->assertEquals(
             'Given type: `invalidType` is not a valid primitive type and also not an existing class',
             $exception->getMessage()
         );
+        $this->assertSame($previous, $exception->getPrevious());
     }
 
     /**
@@ -46,11 +47,44 @@ class CollectionExceptionTest extends TestCase
     public function couldNotMergeCollectionShouldReturnCollectionException(): void
     {
         $exception = CollectionException::couldNotMergeCollection('actualType', 'expectedType');
-
         $this->assertEquals(
             'Can not merge typed collections with different types. This collection is of ' .
             'type: `actualType` and the other collection of type: `expectedType`',
             $exception->getMessage()
         );
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function emptyElementsCanNotDetermineTypeShouldReturnCollectionException(): void
+    {
+        $exception = CollectionException::emptyElementsCanNotDetermineType();
+        $this->assertEquals(
+            'Elements can not be empty, because type can NOT be determined',
+            $exception->getMessage()
+        );
+    }
+
+    /**
+     * @test
+     *
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @return void
+     */
+    public function couldNotCreateTypeFromValueShouldReturnCollectionException(): void
+    {
+        $previous = new \Exception('Previous exception');
+        $exception = CollectionException::couldNotCreateTypeFromValue($previous);
+        $this->assertEquals(
+            'Could not create type from value',
+            $exception->getMessage()
+        );
+        $this->assertSame($previous, $exception->getPrevious());
     }
 }
