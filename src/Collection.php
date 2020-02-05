@@ -92,12 +92,14 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param mixed $element
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function unshiftElement($element): void
+    public function unshiftElement($element): self
     {
         $this->assertElementIsValid($element);
         \array_unshift($this->elements, $element);
+
+        return $this;
     }
 
     /**
@@ -105,12 +107,14 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param mixed $element
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function pushElement($element): void
+    public function pushElement($element): self
     {
         $this->assertElementIsValid($element);
         $this->elements[] = $element;
+
+        return $this;
     }
 
     /**
@@ -156,13 +160,15 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param mixed[] $elements
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function pushElements(array $elements): void
+    public function pushElements(array $elements): self
     {
         foreach ($elements as $element) {
             $this->pushElement($element);
         }
+
+        return $this;
     }
 
     /**
@@ -170,24 +176,28 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param mixed[] $elements
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function unshiftElements(array $elements): void
+    public function unshiftElements(array $elements): self
     {
         foreach (\array_reverse($elements) as $element) {
             $this->unshiftElement($element);
         }
+
+        return $this;
     }
 
     /**
      * @param mixed[] $elements
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function setElements(array $elements): void
+    public function setElements(array $elements): self
     {
         $this->clear();
         $this->pushElements($elements);
+
+        return $this;
     }
 
     /**
@@ -197,9 +207,9 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param mixed $element
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function removeElement($element): void
+    public function removeElement($element): self
     {
         $this->assertElementIsValid($element);
 
@@ -208,6 +218,8 @@ class Collection implements \Countable, \IteratorAggregate
         } else {
             throw new CollectionException('Element doesn\'t exists in this collection');
         }
+
+        return $this;
     }
 
     /**
@@ -482,9 +494,9 @@ class Collection implements \Countable, \IteratorAggregate
      * @param Collection $otherCollection
      * @param Collection ...$otherCollections
      * @throws CollectionException
-     * @return void
+     * @return $this
      */
-    public function merge(Collection $otherCollection, Collection ...$otherCollections): void
+    public function merge(Collection $otherCollection, Collection ...$otherCollections): self
     {
         \array_unshift($otherCollections, $otherCollection);
 
@@ -495,6 +507,8 @@ class Collection implements \Countable, \IteratorAggregate
 
             $this->pushElements($currentOtherCollection->toArray());
         }
+
+        return $this;
     }
 
     /**
@@ -565,13 +579,15 @@ class Collection implements \Countable, \IteratorAggregate
      * must accept an integer. The return type of the callback should be void.
      *
      * @param callable $callback
-     * @return void
+     * @return $this
      */
-    public function forEach(callable $callback): void
+    public function forEach(callable $callback): self
     {
         foreach ($this->elements as $index => $element) {
             $callback($element, $index);
         }
+
+        return $this;
     }
 
     /**
@@ -765,11 +781,13 @@ class Collection implements \Countable, \IteratorAggregate
     /**
      * Remove all elements from this collection. This collection will be empty afterwards.
      *
-     * @return void
+     * @return $this
      */
-    public function clear(): void
+    public function clear(): self
     {
         $this->elements = [];
+
+        return $this;
     }
 
     /**
