@@ -16,27 +16,41 @@ use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use stdClass;
+use Throwable;
 
 /**
  * @package Jojo1981\TypedCollection\TestSuite\Test
  */
-class CollectionTest extends TestCase
+final class CollectionTest extends TestCase
 {
     /**
      * @test
      * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getInvalidTypes()
      *
      * @param string $invalidType
+     * @param string|null $previousExceptionClass
      * @return void
-     *@throws CollectionException
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws CollectionException
      */
-    public function constructWithInvalidTypeShouldThrowCollectionException(string $invalidType): void
+    public function constructWithInvalidTypeShouldThrowCollectionException(string $invalidType, ?string $previousExceptionClass): void
     {
-        $this->expectExceptionObject(new CollectionException(
-            'Given type: `' . $invalidType . '` is not a valid primitive type and also not an existing class'
-        ));
-        new Collection($invalidType);
+        $this->expectExceptionObject(CollectionException::typeIsNotValid($invalidType));
+        try {
+            new Collection($invalidType);
+        } catch (Throwable $exception) {
+            if (null === $previousExceptionClass) {
+                self::assertNull($exception->getPrevious());
+            } else {
+                self::assertInstanceOf($previousExceptionClass, $exception->getPrevious());
+            }
+            throw $exception;
+        }
     }
 
     /**
@@ -44,18 +58,20 @@ class CollectionTest extends TestCase
      * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getPrimitiveTypeWithInvalidData
      *
      * @param string $type
-     * @param mixed[] $invalidData
+     * @param array $invalidData
      * @param string $message
      * @return void
-     *@throws CollectionException
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function constructWithValidPrimitiveTypeButInvalidElementShouldThrowCollectionException(
         string $type,
         array $invalidData,
         string $message
-    ): void
-    {
-        $this->expectExceptionObject(new CollectionException($message));
+    ): void {
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         new Collection($type, $invalidData);
     }
 
@@ -64,10 +80,11 @@ class CollectionTest extends TestCase
      * @dataProvider \Jojo1981\TypedCollection\TestSuite\DataProvider\CollectionDataProvider::getClassNameTypeWithInvalidData
      *
      * @param string $type
-     * @param mixed[] $invalidData
+     * @param array $invalidData
      * @param string $message
      * @return void
-     *@throws CollectionException
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function constructWithValidClassNameTypeButInvalidElementShouldThrowCollectionException(
         string $type,
@@ -75,7 +92,9 @@ class CollectionTest extends TestCase
         string $message
     ): void
     {
-        $this->expectExceptionObject(new CollectionException($message));
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionCode(0);
         new Collection($type, $invalidData);
     }
 
@@ -85,10 +104,11 @@ class CollectionTest extends TestCase
      *
      * @param string $type
      * @param string $expectedType
-     * @return void
-     *@throws InvalidArgumentException
      * @throws CollectionException
      * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @return void
      */
     public function getTypeShouldReturnTheCorrectType(string $type, string $expectedType): void
     {
@@ -101,10 +121,11 @@ class CollectionTest extends TestCase
      *
      * @param string $typeA
      * @param string $typeB
-     * @return void
-     *@throws InvalidArgumentException
      * @throws CollectionException
      * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @return void
      */
     public function isEqualTypeShouldReturnFalseWhenTypeNotStrictlyMatches(string $typeA, string $typeB): void
     {
@@ -117,10 +138,11 @@ class CollectionTest extends TestCase
      *
      * @param string $typeA
      * @param string $typeB
-     * @return void
-     *@throws InvalidArgumentException
      * @throws CollectionException
      * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @return void
      */
     public function isEqualTypeShouldReturnTrueWhenTypeStrictlyMatches(string $typeA, string $typeB): void
     {
@@ -130,10 +152,11 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @return void
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @throws CollectionException
-     * @return void
      */
     public function isEmptyShouldReturnTrueWhenTheCollectionIsEmpty(): void
     {
@@ -143,9 +166,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEmptyShouldReturnFalseWhenTheCollectionIsNotEmpty(): void
@@ -156,9 +180,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isNonEmptyShouldReturnFalseWhenTheCollectionIsNotEmpty(): void
@@ -169,9 +194,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isNonEmptyShouldReturnTrueWhenTheCollectionIsEmpty(): void
@@ -182,9 +208,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function unshiftElementShouldAddAnElementToTheBeginOfTheCollection(): void
@@ -205,9 +232,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function pushElementShouldAddAnElementToTheEndOfTheCollection(): void
@@ -229,13 +257,14 @@ class CollectionTest extends TestCase
      * @test
      *
      * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function createFromCollectionsShouldThrowCollectionExceptionBecauseInvalidTypeIsGiven(): void
     {
-        $this->expectExceptionObject(new CollectionException(
-            'Given type: `invalidType` is not a valid primitive type and also not an existing class'
-        ));
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage('Given type: `invalidType` is not a valid primitive type and also not an existing class');
+        $this->expectExceptionCode(0);
         Collection::createFromCollections('invalidType', []);
     }
 
@@ -243,11 +272,14 @@ class CollectionTest extends TestCase
      * @test
      *
      * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function createFromCollectionsShouldThrowCollectionExceptionBecauseEmptyArrayGiven(): void
     {
-        $this->expectExceptionObject(new CollectionException('An empty array with typed collections passed'));
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage('An empty array with typed collections passed');
+        $this->expectExceptionCode(0);
         Collection::createFromCollections('string', []);
     }
 
@@ -255,11 +287,14 @@ class CollectionTest extends TestCase
      * @test
      *
      * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function createFromCollectionsShouldThrowCollectionExceptionBecauseNotEnoughCollectionsGiven(): void
     {
-        $this->expectExceptionObject(new CollectionException('At least 2 collections needs to be passed'));
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage('At least 2 collections needs to be passed');
+        $this->expectExceptionCode(0);
         Collection::createFromCollections('string', [new Collection('string')]);
     }
 
@@ -267,11 +302,14 @@ class CollectionTest extends TestCase
      * @test
      *
      * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function createFromCollectionsShouldThrowCollectionExceptionBecauseArgumentCollectionsDoesNotContainOnlyCollection(): void
     {
-        $this->expectExceptionObject(new CollectionException('Expect $collections array to contain instances of Collection'));
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage('Expect $collections array to contain instances of Collection');
+        $this->expectExceptionCode(0);
         Collection::createFromCollections('string', [new Collection('string'), 'text']);
     }
 
@@ -279,22 +317,24 @@ class CollectionTest extends TestCase
      * @test
      *
      * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function createFromCollectionsShouldThrowCollectionExceptionBecauseNotAllCollectionAreOfTheExpectedType(): void
     {
-        $this->expectExceptionObject(new CollectionException(
-            'Expect every collection to be of type: `string`. Collection found with type: `int`'
-        ));
+        $this->expectException(CollectionException::class);
+        $this->expectExceptionMessage('Expect every collection to be of type: `string`. Collection found with type: `int`');
+        $this->expectExceptionCode(0);
         Collection::createFromCollections('string', [new Collection('string'), new Collection('int')]);
     }
 
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function createFromCollectionsShouldReturnOneCollection(): void
@@ -325,16 +365,17 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnFalseWhenCollectionTypesDoNotMatch(): void
     {
         $collection1 = new Collection('string');
         $collection2 = new Collection('integer');
-        $predicate = function ($elementA, $elementB): bool {
+        $predicate = function (): bool {
             $this->fail('Predicate callback should not be invoked');
 
             return true;
@@ -349,16 +390,17 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnFalseWhenCollectionTypesAreMatchingButCountIsNotTheSame(): void
     {
         $collection1 = new Collection('string', ['a', 'b']);
         $collection2 = new Collection('string', ['a']);
-        $predicate = function ($elementA, $elementB): bool {
+        $predicate = function (): bool {
             $this->fail('Predicate callback should not be invoked');
 
             return true;
@@ -373,9 +415,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnFalseWhenCollectionTypesAreMatchingCountIsTheSameButNotAllElementAreEqual(): void
@@ -395,16 +438,17 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnTrueWhenCollectionTypesAreMatchingAndCollectionsAreEmpty(): void
     {
         $collection1 = new Collection('string');
         $collection2 = new Collection('string');
-        $predicate = function ($elementA, $elementB): bool {
+        $predicate = function (): bool {
             $this->fail('Predicate callback should not be invoked');
 
             return true;
@@ -419,9 +463,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnFalseWhenStrictIsTrueAndElementsAreMatchingButNotInSameOrder(): void
@@ -439,9 +484,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnTrueWhenStrictIsTrueAndElementsAreMatchingAndInSameOrder(): void
@@ -459,9 +505,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnTrueWhenStrictIsFalseAndElementsAreMatchingButNotInSameOrder(): void
@@ -479,9 +526,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnFalseWhenNoPredicateIsGivenAndCollectionsAreNotEqual(): void
@@ -498,9 +546,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnTrueWhenNoPredicateIsGivenAndCollectionsAreEqual(): void
@@ -517,9 +566,10 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnCorrectResultWhenNoPredicateIsGivenAndCollectionsAreUnorderedEqual(): void
@@ -536,15 +586,16 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnFalseWhenNoPredicateIsGivenAndCollectionsAreNotEqualBecauseOfStrictlyEqualsComparision(): void
     {
-        $collection1 = new Collection(\stdClass::class, [new \stdClass()]);
-        $collection2 = new Collection(\stdClass::class, [new \stdClass()]);
+        $collection1 = new Collection(stdClass::class, [new stdClass()]);
+        $collection2 = new Collection(stdClass::class, [new stdClass()]);
 
         $this->assertFalse($collection1->isEqualCollection($collection2));
         $this->assertFalse($collection1->isEqualCollection($collection2, null, true));
@@ -555,16 +606,17 @@ class CollectionTest extends TestCase
     /**
      * @test
      *
+     * @throws CollectionException
      * @throws ExpectationFailedException
      * @throws InvalidArgumentException
-     * @throws CollectionException
+     * @throws RuntimeException
      * @return void
      */
     public function isEqualCollectionShouldReturnTrueWhenNoPredicateIsGivenAndCollectionsAreEqualEvenWithStrictlyEqualsComparision(): void
     {
-        $element = new \stdClass();
-        $collection2 = new Collection(\stdClass::class, [$element]);
-        $collection1 = new Collection(\stdClass::class, [$element]);
+        $element = new stdClass();
+        $collection2 = new Collection(stdClass::class, [$element]);
+        $collection1 = new Collection(stdClass::class, [$element]);
 
         $this->assertTrue($collection1->isEqualCollection($collection2));
         $this->assertTrue($collection1->isEqualCollection($collection2, null, true));

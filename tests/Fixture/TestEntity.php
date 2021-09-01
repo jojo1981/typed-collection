@@ -12,6 +12,6 @@ namespace Jojo1981\TypedCollection\TestSuite\Fixture;
 /**
  * @package Jojo1981\TypedCollection\TestSuite\Fixture
  */
-class TestEntity extends TestEntityBase
+final class TestEntity extends TestEntityBase
 {
 }

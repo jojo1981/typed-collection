@@ -9,6 +9,8 @@
  */
 namespace Jojo1981\TypedCollection\TestSuite\Test;
 
+use ArrayIterator;
+use BadMethodCallException;
 use Jojo1981\TypedCollection\CollectionIterator;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -16,15 +18,18 @@ use Prophecy\Exception\Doubler\ClassNotFoundException;
 use Prophecy\Exception\Doubler\DoubleException;
 use Prophecy\Exception\Doubler\InterfaceNotFoundException;
 use Prophecy\Exception\Prophecy\ObjectProphecyException;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * @package Jojo1981\TypedCollection\TestSuite\Test
  */
-class CollectionIteratorTest extends TestCase
+final class CollectionIteratorTest extends TestCase
 {
-    /** @var ObjectProphecy|\ArrayIterator */
+    use ProphecyTrait;
+
+    /** @var ObjectProphecy|ArrayIterator */
     private $arrayIterator;
 
     /**
@@ -35,19 +40,19 @@ class CollectionIteratorTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->arrayIterator = $this->prophesize(\ArrayIterator::class);
+        $this->arrayIterator = $this->prophesize(ArrayIterator::class);
     }
 
     /**
      * @test
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      * @throws ObjectProphecyException
      * @return void
      */
     public function offsetSetShouldThrowBadMethodCallException(): void
     {
-        $this->expectExceptionObject(new \BadMethodCallException(
+        $this->expectExceptionObject(new BadMethodCallException(
             'Don\'t use array access to add an element but use Jojo1981\TypedCollection\Collection::addElement'
         ));
 
@@ -57,13 +62,13 @@ class CollectionIteratorTest extends TestCase
     /**
      * @test
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      * @throws ObjectProphecyException
      * @return void
      */
     public function offsetUnsetShouldThrowBadMethodCallException(): void
     {
-        $this->expectExceptionObject(new \BadMethodCallException(
+        $this->expectExceptionObject(new BadMethodCallException(
             'Don\'t use array access to add an element but use Jojo1981\TypedCollection\Collection::removeElement'
         ));
 

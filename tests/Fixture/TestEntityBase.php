@@ -14,5 +14,4 @@ namespace Jojo1981\TypedCollection\TestSuite\Fixture;
  */
 class TestEntityBase extends AbstractTestEntity
 {
-
 }

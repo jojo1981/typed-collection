@@ -9,19 +9,25 @@
  */
 namespace Jojo1981\TypedCollection;
 
+use ArrayAccess;
+use ArrayIterator;
+use BadMethodCallException;
+use Countable;
+use SeekableIterator;
+
 /**
  * @api
  * @package Jojo1981\TypedCollection
  */
-class CollectionIterator implements \SeekableIterator, \ArrayAccess, \Countable
+final class CollectionIterator implements SeekableIterator, ArrayAccess, Countable
 {
-    /** @var \ArrayIterator */
-    private $arrayIterator;
+    /** @var ArrayIterator */
+    private ArrayIterator $arrayIterator;
 
     /**
-     * @param \ArrayIterator $arrayIterator
+     * @param ArrayIterator $arrayIterator
      */
-    public function __construct(\ArrayIterator $arrayIterator)
+    public function __construct(ArrayIterator $arrayIterator)
     {
         $this->arrayIterator = $arrayIterator;
     }
@@ -29,24 +35,24 @@ class CollectionIterator implements \SeekableIterator, \ArrayAccess, \Countable
     /**
      * @param mixed $offset
      * @param mixed $value
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      * @return void
      */
     public function offsetSet($offset, $value): void
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             'Don\'t use array access to add an element but use ' . Collection::class . '::addElement'
         );
     }
 
     /**
      * @param mixed $offset
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      * @return void
      */
     public function offsetUnset($offset): void
     {
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             'Don\'t use array access to add an element but use ' . Collection::class . '::removeElement'
         );
     }
@@ -92,12 +98,12 @@ class CollectionIterator implements \SeekableIterator, \ArrayAccess, \Countable
     }
 
     /**
-     * @param int $position
+     * @param int $offset
      * @return void
      */
-    public function seek($position): void
+    public function seek($offset): void
     {
-        $this->arrayIterator->seek($position);
+        $this->arrayIterator->seek($offset);
     }
 
     /**

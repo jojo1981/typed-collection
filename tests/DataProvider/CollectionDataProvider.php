@@ -9,15 +9,17 @@
  */
 namespace Jojo1981\TypedCollection\TestSuite\DataProvider;
 
+use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity;
 use Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase;
+use stdClass;
 
 /**
  * @package Jojo1981\TypedCollection\TestSuite\DataProvider
  */
-class CollectionDataProvider
+final class CollectionDataProvider
 {
     /**
      * @return array[]
@@ -25,10 +27,10 @@ class CollectionDataProvider
     public function getInvalidTypes(): array
     {
         return [
-            ['invalid-type'],
-            ['mixed'],
-            ['null'],
-            ['void'],
+            ['invalid-type', TypeException::class],
+            ['mixed', null],
+            ['null', null],
+            ['void', null],
         ];
     }
 
@@ -397,7 +399,7 @@ class CollectionDataProvider
             ['int', [-1, 0, 1, 5, []], 'Data is not of expected type: `int`, but of type: `array`'],
             ['int', [-1, 0, 1, 5, ['item1', 'item2']], 'Data is not of expected type: `int`, but of type: `array`'],
             ['int', [-1, 0, 1, 5, ['key' => 'value']], 'Data is not of expected type: `int`, but of type: `array`'],
-            ['int', [-1, 0, 1, 5, new \stdClass()], 'Data is not of expected type: `int`, but an instance of: `\stdClass`'],
+            ['int', [-1, 0, 1, 5, new stdClass()], 'Data is not of expected type: `int`, but an instance of: `\stdClass`'],
             ['int', [-1, 0, 1, 5, new TestEntity()], 'Data is not of expected type: `int`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['int', [-1, 0, 1, 5, new TestEntityBase()], 'Data is not of expected type: `int`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -410,7 +412,7 @@ class CollectionDataProvider
             ['integer', [-1, 0, 1, 5, []], 'Data is not of expected type: `int`, but of type: `array`'],
             ['integer', [-1, 0, 1, 5, ['item1', 'item2']], 'Data is not of expected type: `int`, but of type: `array`'],
             ['integer', [-1, 0, 1, 5, ['key' => 'value']], 'Data is not of expected type: `int`, but of type: `array`'],
-            ['integer', [-1, 0, 1, 5, new \stdClass()], 'Data is not of expected type: `int`, but an instance of: `\stdClass`'],
+            ['integer', [-1, 0, 1, 5, new stdClass()], 'Data is not of expected type: `int`, but an instance of: `\stdClass`'],
             ['integer', [-1, 0, 1, 5, new TestEntity()], 'Data is not of expected type: `int`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['integer', [-1, 0, 1, 5, new TestEntityBase()], 'Data is not of expected type: `int`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -423,7 +425,7 @@ class CollectionDataProvider
             ['float', [-1.0, 0.0, 1.0, 3.25, []], 'Data is not of expected type: `float`, but of type: `array`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, ['item1', 'item2']], 'Data is not of expected type: `float`, but of type: `array`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, ['key' => 'value']], 'Data is not of expected type: `float`, but of type: `array`'],
-            ['float', [-1.0, 0.0, 1.0, 3.25, new \stdClass()], 'Data is not of expected type: `float`, but an instance of: `\stdClass`'],
+            ['float', [-1.0, 0.0, 1.0, 3.25, new stdClass()], 'Data is not of expected type: `float`, but an instance of: `\stdClass`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, new TestEntity()], 'Data is not of expected type: `float`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['float', [-1.0, 0.0, 1.0, 3.25, new TestEntityBase()], 'Data is not of expected type: `float`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -436,7 +438,7 @@ class CollectionDataProvider
             ['double', [-1.0, 0.0, 1.0, 3.25, []], 'Data is not of expected type: `float`, but of type: `array`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, ['item1', 'item2']], 'Data is not of expected type: `float`, but of type: `array`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, ['key' => 'value']], 'Data is not of expected type: `float`, but of type: `array`'],
-            ['double', [-1.0, 0.0, 1.0, 3.25, new \stdClass()], 'Data is not of expected type: `float`, but an instance of: `\stdClass`'],
+            ['double', [-1.0, 0.0, 1.0, 3.25, new stdClass()], 'Data is not of expected type: `float`, but an instance of: `\stdClass`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, new TestEntity()], 'Data is not of expected type: `float`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['double', [-1.0, 0.0, 1.0, 3.25, new TestEntityBase()], 'Data is not of expected type: `float`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -449,7 +451,7 @@ class CollectionDataProvider
             ['number', [-1.0, 0.0, 1.0, 3.25, []], 'Data is not of expected type: `float`, but of type: `array`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, ['item1', 'item2']], 'Data is not of expected type: `float`, but of type: `array`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, ['key' => 'value']], 'Data is not of expected type: `float`, but of type: `array`'],
-            ['number', [-1.0, 0.0, 1.0, 3.25, new \stdClass()], 'Data is not of expected type: `float`, but an instance of: `\stdClass`'],
+            ['number', [-1.0, 0.0, 1.0, 3.25, new stdClass()], 'Data is not of expected type: `float`, but an instance of: `\stdClass`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, new TestEntity()], 'Data is not of expected type: `float`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['number', [-1.0, 0.0, 1.0, 3.25, new TestEntityBase()], 'Data is not of expected type: `float`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -464,7 +466,7 @@ class CollectionDataProvider
             ['string', ['text', []], 'Data is not of expected type: `string`, but of type: `array`'],
             ['string', ['text', ['item1', 'item2']], 'Data is not of expected type: `string`, but of type: `array`'],
             ['string', ['text', ['key' => 'value']], 'Data is not of expected type: `string`, but of type: `array`'],
-            ['string', ['text', new \stdClass()], 'Data is not of expected type: `string`, but an instance of: `\stdClass`'],
+            ['string', ['text', new stdClass()], 'Data is not of expected type: `string`, but an instance of: `\stdClass`'],
             ['string', ['text', new TestEntity()], 'Data is not of expected type: `string`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['string', ['text', new TestEntityBase()], 'Data is not of expected type: `string`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -478,7 +480,7 @@ class CollectionDataProvider
             ['boolean', [true, false, []], 'Data is not of expected type: `bool`, but of type: `array`'],
             ['boolean', [true, false, ['item1', 'item2']], 'Data is not of expected type: `bool`, but of type: `array`'],
             ['boolean', [true, false, ['key' => 'value']], 'Data is not of expected type: `bool`, but of type: `array`'],
-            ['boolean', [true, false, new \stdClass()], 'Data is not of expected type: `bool`, but an instance of: `\stdClass`'],
+            ['boolean', [true, false, new stdClass()], 'Data is not of expected type: `bool`, but an instance of: `\stdClass`'],
             ['boolean', [true, false, new TestEntity()], 'Data is not of expected type: `bool`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['boolean', [true, false, new TestEntityBase()], 'Data is not of expected type: `bool`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
             
@@ -492,7 +494,7 @@ class CollectionDataProvider
             ['bool', [true, false, []], 'Data is not of expected type: `bool`, but of type: `array`'],
             ['bool', [true, false, ['item1', 'item2']], 'Data is not of expected type: `bool`, but of type: `array`'],
             ['bool', [true, false, ['key' => 'value']], 'Data is not of expected type: `bool`, but of type: `array`'],
-            ['bool', [true, false, new \stdClass()], 'Data is not of expected type: `bool`, but an instance of: `\stdClass`'],
+            ['bool', [true, false, new stdClass()], 'Data is not of expected type: `bool`, but an instance of: `\stdClass`'],
             ['bool', [true, false, new TestEntity()], 'Data is not of expected type: `bool`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['bool', [true, false, new TestEntityBase()], 'Data is not of expected type: `bool`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
@@ -505,22 +507,22 @@ class CollectionDataProvider
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], 1.0], 'Data is not of expected type: `array`, but of type: `float`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], true], 'Data is not of expected type: `array`, but of type: `bool`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], false], 'Data is not of expected type: `array`, but of type: `bool`'],
-            ['array', [[], ['item1', 'item2'], ['key' => 'value'], new \stdClass()], 'Data is not of expected type: `array`, but an instance of: `\stdClass`'],
+            ['array', [[], ['item1', 'item2'], ['key' => 'value'], new stdClass()], 'Data is not of expected type: `array`, but an instance of: `\stdClass`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], new TestEntity()], 'Data is not of expected type: `array`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`'],
             ['array', [[], ['item1', 'item2'], ['key' => 'value'], new TestEntityBase()], 'Data is not of expected type: `array`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 'text'], 'Data is not of expected type: `object`, but of type: `string`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), -1], 'Data is not of expected type: `object`, but of type: `int`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 0], 'Data is not of expected type: `object`, but of type: `int`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 1], 'Data is not of expected type: `object`, but of type: `int`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), -1.0], 'Data is not of expected type: `object`, but of type: `float`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 0.0], 'Data is not of expected type: `object`, but of type: `float`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), 1.0], 'Data is not of expected type: `object`, but of type: `float`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), true], 'Data is not of expected type: `object`, but of type: `bool`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), false], 'Data is not of expected type: `object`, but of type: `bool`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), []], 'Data is not of expected type: `object`, but of type: `array`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), ['item1', 'item2']], 'Data is not of expected type: `object`, but of type: `array`'],
-            ['object', [new \stdClass(), new TestEntity(), new TestEntityBase(), ['key' => 'value']], 'Data is not of expected type: `object`, but of type: `array`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 'text'], 'Data is not of expected type: `object`, but of type: `string`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), -1], 'Data is not of expected type: `object`, but of type: `int`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 0], 'Data is not of expected type: `object`, but of type: `int`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 1], 'Data is not of expected type: `object`, but of type: `int`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), -1.0], 'Data is not of expected type: `object`, but of type: `float`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 0.0], 'Data is not of expected type: `object`, but of type: `float`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), 1.0], 'Data is not of expected type: `object`, but of type: `float`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), true], 'Data is not of expected type: `object`, but of type: `bool`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), false], 'Data is not of expected type: `object`, but of type: `bool`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), []], 'Data is not of expected type: `object`, but of type: `array`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), ['item1', 'item2']], 'Data is not of expected type: `object`, but of type: `array`'],
+            ['object', [new stdClass(), new TestEntity(), new TestEntityBase(), ['key' => 'value']], 'Data is not of expected type: `object`, but of type: `array`'],
         ];
     }
 
@@ -544,8 +546,8 @@ class CollectionDataProvider
             [TestEntity::class, [new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but of type: `array`'],
             [TestEntity::class, [new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but of type: `array`'],
             [TestEntity::class, [new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but of type: `array`'],
-            [TestEntity::class, [new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but an instance of: `\stdClass`'],
-            [TestEntity::class, [new TestEntityBase(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
+            [TestEntity::class, [new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but an instance of: `\stdClass`'],
+            [TestEntity::class, [new TestEntityBase(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntity`, but an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`'],
 
             [TestEntityBase::class, [new TestEntity(), -1], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but of type: `int`'],
             [TestEntityBase::class, [new TestEntity(), 0], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but of type: `int`'],
@@ -559,7 +561,7 @@ class CollectionDataProvider
             [TestEntityBase::class, [new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but of type: `array`'],
             [TestEntityBase::class, [new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but of type: `array`'],
             [TestEntityBase::class, [new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but of type: `array`'],
-            [TestEntityBase::class, [new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but an instance of: `\stdClass`'],
+            [TestEntityBase::class, [new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\TestEntityBase`, but an instance of: `\stdClass`'],
 
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), -1], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but of type: `int`'],
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), 0], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but of type: `int`'],
@@ -573,7 +575,7 @@ class CollectionDataProvider
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but of type: `array`'],
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but of type: `array`'],
             [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but of type: `array`'],
-            [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but an instance of: `\stdClass`'],
+            [AbstractTestEntity::class, [new TestEntityBase(), new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\AbstractTestEntity`, but an instance of: `\stdClass`'],
 
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), -1], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but of type: `int`'],
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), 0], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but of type: `int`'],
@@ -587,7 +589,7 @@ class CollectionDataProvider
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), []], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but of type: `array`'],
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), ['item1', 'item2']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but of type: `array`'],
             [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), ['key' => 'value']], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but of type: `array`'],
-            [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), new \stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but an instance of: `\stdClass`']
+            [InterfaceTestEntity::class, [new TestEntityBase(), new TestEntity(), new stdClass()], 'Data is not an instance of: `\Jojo1981\TypedCollection\TestSuite\Fixture\InterfaceTestEntity`, but an instance of: `\stdClass`']
         ];
     }
 }

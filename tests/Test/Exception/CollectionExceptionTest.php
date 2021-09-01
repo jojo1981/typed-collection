@@ -9,6 +9,7 @@
  */
 namespace Jojo1981\TypedCollection\TestSuite\Test\Exception;
 
+use Exception;
 use Jojo1981\TypedCollection\Exception\CollectionException;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +18,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 /**
  * @package Jojo1981\TypedCollection\TestSuite\Test\Exception
  */
-class CollectionExceptionTest extends TestCase
+final class CollectionExceptionTest extends TestCase
 {
     /**
      * @test
@@ -28,7 +29,7 @@ class CollectionExceptionTest extends TestCase
      */
     public function typeIsNotValidShouldReturnCollectionException(): void
     {
-        $previous = new \Exception('Previous exception');
+        $previous = new Exception('Previous exception');
         $exception = CollectionException::typeIsNotValid('invalidType', $previous);
         $this->assertEquals(
             'Given type: `invalidType` is not a valid primitive type and also not an existing class',
@@ -79,7 +80,7 @@ class CollectionExceptionTest extends TestCase
      */
     public function couldNotCreateTypeFromValueShouldReturnCollectionException(): void
     {
-        $previous = new \Exception('Previous exception');
+        $previous = new Exception('Previous exception');
         $exception = CollectionException::couldNotCreateTypeFromValue($previous);
         $this->assertEquals(
             'Could not create type from value',

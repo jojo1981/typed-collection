@@ -9,11 +9,36 @@
  */
 namespace Jojo1981\TypedCollection;
 
+use ArrayIterator;
+use Countable;
+use InvalidArgumentException;
+use IteratorAggregate;
 use Jojo1981\PhpTypes\AbstractType;
-use Jojo1981\PhpTypes\ClassType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
 use Jojo1981\TypedCollection\Exception\CollectionException;
+use RuntimeException;
+use function array_fill;
+use function array_filter;
+use function array_keys;
+use function array_map;
+use function array_pop;
+use function array_push;
+use function array_reduce;
+use function array_reverse;
+use function array_search;
+use function array_shift;
+use function array_slice;
+use function array_unshift;
+use function array_values;
+use function count;
+use function end;
+use function in_array;
+use function is_array;
+use function reset;
+use function sprintf;
+use function strtolower;
+use function usort;
 
 /**
  * This is a mutable collection and is a wrapper around an indexed array and can only hold elements of the same type.
@@ -21,22 +46,24 @@ use Jojo1981\TypedCollection\Exception\CollectionException;
  *
  * @api
  * @package Jojo1981\TypedCollection
+ * @template T
  */
-class Collection implements \Countable, \IteratorAggregate
+class Collection implements Countable, IteratorAggregate
 {
     /** @var TypeInterface */
-    private $type;
+    private TypeInterface $type;
 
-    /** @var mixed[] */
-    private $elements = [];
+    /** @var T[] */
+    private array $elements = [];
 
     /**
-     * Construct a new collection an set the type for this collection. The type of the collection can be any
-     * primitive type or any class\interface type. Optionally some element can be given.
+     * Construct a new collection and set the type for this collection. The type of the collection can be any
+     * primitive type or any class or interface type. Optionally some element can be given.
      *
      * @param string $type
-     * @param mixed[] $elements (optional)
+     * @param T[] $elements (optional)
      * @throws CollectionException
+     * @throws RuntimeException
      */
     public function __construct(string $type, array $elements = [])
     {
@@ -78,7 +105,7 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Return whether this collection is not empty. A collection with a least 1 element is considered to be not empty.
+     * Return whether this collection is not empty. A collection with at least 1 element is considered to be not empty.
      *
      * @return bool
      */
@@ -88,16 +115,17 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Add an element to the begin (prepend) of this collection.
+     * Add an element to the beginning (prepend) of this collection.
      *
      * @param mixed $element
-     * @throws CollectionException
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function unshiftElement($element): self
     {
         $this->assertElementIsValid($element);
-        \array_unshift($this->elements, $element);
+        array_unshift($this->elements, $element);
 
         return $this;
     }
@@ -106,8 +134,9 @@ class Collection implements \Countable, \IteratorAggregate
      * Add an element to the end (append) of this collection.
      *
      * @param mixed $element
-     * @throws CollectionException
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function pushElement($element): self
     {
@@ -121,46 +150,48 @@ class Collection implements \Countable, \IteratorAggregate
      * Remove the first element of this collection and return that element, when this collection is empty null will be
      * returned instead.
      *
-     * @return null|mixed
+     * @return T|null
      */
     public function shiftElement()
     {
-        return \array_shift($this->elements);
+        return array_shift($this->elements);
     }
 
     /**
      * Remove the last element of this collection and return the element, when this collection is empty null will
      * be returned instead.
      *
-     * @return null|mixed
+     * @return T|null
      */
     public function popElement()
     {
-        return \array_pop($this->elements);
+        return array_pop($this->elements);
     }
 
     /**
-     * Check if this collection contains the given element. This will be done by strict comparision.
-     * When this collection contains objects the comparision will be done by reference. Use `some` when you need to
+     * Check if this collection contains the given element. This will be done by strict comparison.
+     * When this collection contains objects the comparison will be done by reference. Use `some` when you need to
      * check if there is an element which matches a custom predicate.
      *
-     * @param mixed $element
-     * @throws CollectionException
+     * @param T $element
      * @return bool
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function hasElement($element): bool
     {
         $this->assertElementIsValid($element);
 
-        return \in_array($element, $this->elements, true);
+        return in_array($element, $this->elements, true);
     }
 
     /**
      * Add elements to the end (append) of this collection.
      *
-     * @param mixed[] $elements
-     * @throws CollectionException
+     * @param T[] $elements
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function pushElements(array $elements): self
     {
@@ -172,15 +203,16 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Add elements to the begin (prepend) of this collection.
+     * Add elements to the beginning (prepend) of this collection.
      *
-     * @param mixed[] $elements
-     * @throws CollectionException
+     * @param T[] $elements
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function unshiftElements(array $elements): self
     {
-        foreach (\array_reverse($elements) as $element) {
+        foreach (array_reverse($elements) as $element) {
             $this->unshiftElement($element);
         }
 
@@ -188,9 +220,10 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param mixed[] $elements
-     * @throws CollectionException
+     * @param T[] $elements
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function setElements(array $elements): self
     {
@@ -201,39 +234,41 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Remove the given element from this collection when it exists in this collection. When the element does not exists
+     * Remove the given element from this collection when it exists in this collection. When the element does not exist
      * in this collection a CollectionException will be thrown. Use Collection::hasElement to check if an element exist
      * in this collection.
      *
      * @param mixed $element
-     * @throws CollectionException
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function removeElement($element): self
     {
         $this->assertElementIsValid($element);
 
-        if (false !== $index = \array_search($element, $this->elements, true)) {
+        if (false !== $index = array_search($element, $this->elements, true)) {
             unset($this->elements[$index]);
         } else {
-            throw new CollectionException('Element doesn\'t exists in this collection');
+            throw CollectionException::noSuchElement();
         }
 
         return $this;
     }
 
     /**
-     * Get the index (zero based position) of an element in this collection. When the element does not exists in this
+     * Get the index (zero based position) of an element in this collection. When the element does not exist in this
      * collection null will be returned instead.
      *
-     * @param mixed $element
+     * @param T $element
+     * @return int|null
+     * @throws RuntimeException
      * @throws CollectionException
-     * @return null|int
      */
     public function indexOfElement($element): ?int
     {
         $this->assertElementIsValid($element);
-        if (false !== $index = \array_search($element, $this->elements, true)) {
+        if (false !== $index = array_search($element, $this->elements, true)) {
             return $index;
         }
 
@@ -243,12 +278,13 @@ class Collection implements \Countable, \IteratorAggregate
     /**
      * Returns a new Collection with all elements in reverse order.
      *
-     * @throws CollectionException
      * @return Collection
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function reverse(): Collection
     {
-        return new Collection($this->type->getName(), \array_reverse($this->elements));
+        return new Collection($this->type->getName(), array_reverse($this->elements));
     }
 
     /**
@@ -256,17 +292,18 @@ class Collection implements \Countable, \IteratorAggregate
      * If the passed number is greater than the available number of elements, all will be removed.
      *
      * @param int $number
-     * @throws CollectionException
-     * @throws \InvalidArgumentException
      * @return Collection
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function drop(int $number): Collection
     {
         if ($number <= 0) {
-            throw new \InvalidArgumentException(\sprintf('The number must be greater than 0, but got %d.', $number));
+            throw new InvalidArgumentException(sprintf('The number must be greater than 0, but got %d.', $number));
         }
 
-        return new Collection($this->type->getName(), \array_slice($this->elements, $number));
+        return new Collection($this->type->getName(), array_slice($this->elements, $number));
     }
 
     /**
@@ -274,17 +311,18 @@ class Collection implements \Countable, \IteratorAggregate
      * If the passed number is greater than the available number of elements, all will be removed.
      *
      * @param int $number
-     * @throws \InvalidArgumentException
-     * @throws CollectionException
      * @return Collection
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function dropRight(int $number): Collection
     {
         if ($number <= 0) {
-            throw new \InvalidArgumentException(sprintf('The number must be greater than 0, but got %d.', $number));
+            throw new InvalidArgumentException(sprintf('The number must be greater than 0, but got %d.', $number));
         }
 
-        return new Collection($this->type->getName(), \array_slice($this->elements, 0, -1 * $number));
+        return new Collection($this->type->getName(), array_slice($this->elements, 0, -1 * $number));
     }
 
     /**
@@ -293,6 +331,7 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param callable $callback
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function dropWhile(callable $callback): Collection
@@ -304,7 +343,7 @@ class Collection implements \Countable, \IteratorAggregate
             }
         }
 
-        return new Collection($this->type->getName(), \array_slice($this->elements, $currentIndex));
+        return new Collection($this->type->getName(), array_slice($this->elements, $currentIndex));
     }
 
     /**
@@ -315,17 +354,18 @@ class Collection implements \Countable, \IteratorAggregate
      * will be returned as a new collection.
      *
      * @param int $number
-     * @throws \InvalidArgumentException
      * @throws CollectionException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      * @return Collection
      */
     public function take(int $number): Collection
     {
         if ($number <= 0) {
-            throw new \InvalidArgumentException(sprintf('$number must be greater than 0, but got %d.', $number));
+            throw new InvalidArgumentException(sprintf('$number must be greater than 0, but got %d.', $number));
         }
 
-        return new Collection($this->type->getName(), \array_slice($this->elements, 0, $number));
+        return new Collection($this->type->getName(), array_slice($this->elements, 0, $number));
     }
 
     /**
@@ -334,6 +374,7 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param callable $callable
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function takeWhile(callable $callable): Collection
@@ -351,11 +392,11 @@ class Collection implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Get an element by the given index. Returns the element or null when the given index does not exists in this
+     * Get an element by the given index. Returns the element or null when the given index does not exist in this
      * collection.
      *
      * @param int $index
-     * @return null|mixed
+     * @return T|null
      */
     public function getElementByIndex(int $index)
     {
@@ -365,11 +406,11 @@ class Collection implements \Countable, \IteratorAggregate
     /**
      * Get the first element of this collection. When this collection is empty null will be returned.
      *
-     * @return null|mixed
+     * @return T|null
      */
     public function getFirstElement()
     {
-        $lastElement = \reset($this->elements);
+        $lastElement = reset($this->elements);
 
         return false !== $lastElement ? $lastElement : null;
     }
@@ -377,11 +418,11 @@ class Collection implements \Countable, \IteratorAggregate
     /**
      * Get the last element of this collection. When this collection is empty null will be returned.
      *
-     * @return null|mixed
+     * @return T|null
      */
     public function getLastElement()
     {
-        $lastElement = \end($this->elements);
+        $lastElement = end($this->elements);
 
         return false !== $lastElement ? $lastElement : null;
     }
@@ -391,6 +432,7 @@ class Collection implements \Countable, \IteratorAggregate
      * empty collection will be returned. The newly returned collection has the same type as this collection.
      *
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function getFirstElementAsCollection(): Collection
@@ -406,11 +448,11 @@ class Collection implements \Countable, \IteratorAggregate
     /**
      * Get all elements from this collection as an indexed array.
      *
-     * @return mixed[]
+     * @return T[]
      */
     public function toArray(): array
     {
-        return \array_values($this->elements);
+        return array_values($this->elements);
     }
 
     /**
@@ -420,13 +462,14 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param callable $comparator
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function sortBy(callable $comparator): Collection
     {
         $elements = $this->elements;
-        if (false === \usort($elements, $comparator)) {
-            throw new CollectionException('Could not sort the collection');
+        if (false === usort($elements, $comparator)) {
+            throw CollectionException::couldNotSortCollection();
         }
 
         return new Collection($this->getType(), $elements);
@@ -442,6 +485,7 @@ class Collection implements \Countable, \IteratorAggregate
      * @param string $type
      * @param callable $mapper
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function map(string $type, callable $mapper): Collection
@@ -451,11 +495,11 @@ class Collection implements \Countable, \IteratorAggregate
 
         return new Collection(
             $type,
-            \array_map(
+            array_map(
                 static function (int $index) use ($elements, $mapper) {
                     return $mapper($elements[$index], $index);
                 },
-                \array_keys($elements)
+                array_keys($elements)
             )
         );
     }
@@ -471,6 +515,7 @@ class Collection implements \Countable, \IteratorAggregate
      * @param string $type
      * @param callable $mapper
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function flatMap(string $type, callable $mapper): Collection
@@ -479,9 +524,9 @@ class Collection implements \Countable, \IteratorAggregate
         $results = [];
         foreach ($this->elements as $index => $value) {
             $mapperResult = $mapper($value, $index);
-            $values = !\is_array($mapperResult) ? [$mapperResult] : \array_values($mapperResult);
+            $values = !is_array($mapperResult) ? [$mapperResult] : array_values($mapperResult);
             if (!empty($values)) {
-                \array_push($results, ...$values);
+                array_push($results, ...$values);
             }
         }
 
@@ -493,12 +538,13 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param Collection $otherCollection
      * @param Collection ...$otherCollections
-     * @throws CollectionException
      * @return $this
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function merge(Collection $otherCollection, Collection ...$otherCollections): self
     {
-        \array_unshift($otherCollections, $otherCollection);
+        array_unshift($otherCollections, $otherCollection);
 
         foreach ($otherCollections as $currentOtherCollection) {
             if (!$this->type->isAssignableType($currentOtherCollection->type)) {
@@ -515,7 +561,7 @@ class Collection implements \Countable, \IteratorAggregate
      * Apply the predicate for all elements in this collection and return true when the predicate has returned true for all
      * elements or when this collection is empty. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
-     * must accept an integer. The return type of the predicate should be a boolean.
+     * must accept an integer. The return type of the predicate should be a boolean value.
      *
      * @param callable $predicate
      * @return bool
@@ -536,7 +582,7 @@ class Collection implements \Countable, \IteratorAggregate
      * element. When this collection is empty false will be returned. As soon as the predicate has returned true the
      * iteration will be stopped and true will be returned. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
-     * must accept an integer. The return type of the predicate should be a boolean.
+     * must accept an integer. The return type of the predicate should be a boolean value.
      *
      * @param callable $predicate
      * @return bool
@@ -557,7 +603,7 @@ class Collection implements \Countable, \IteratorAggregate
      * elements or when this collection is empty. As soon as the predicate has returned true the iteration will be
      * stopped and false will be returned. The predicate callback should accept 2 parameters at max.
      * The first parameter should accept the same type as this collection has and the second parameter is optionally and
-     * must accept an integer. The return type of the predicate should be a boolean.
+     * must accept an integer. The return type of the predicate should be a boolean value.
      *
      * @param callable $predicate
      * @return bool
@@ -597,7 +643,7 @@ class Collection implements \Countable, \IteratorAggregate
      * The return type of the callback should be the same type as the first parameter.
      *
      * @param callable $callback
-     * @param null|mixed $initial
+     * @param T|null $initial
      * @return mixed
      */
     public function foldLeft(callable $callback, $initial = null)
@@ -617,13 +663,13 @@ class Collection implements \Countable, \IteratorAggregate
      * The return type of the callback should be the same type as the first parameter.
      *
      * @param callable $callback
-     * @param null|mixed $initial
+     * @param T|null $initial
      * @return mixed
      */
     public function foldRight(callable $callback, $initial = null)
     {
         $result = $initial;
-        foreach (\array_reverse($this->elements) as $index => $element) {
+        foreach (array_reverse($this->elements) as $index => $element) {
             $result = $callback($result, $element, $index);
         }
 
@@ -636,15 +682,16 @@ class Collection implements \Countable, \IteratorAggregate
      * added to the new collection. When the predicate never matches an empty collection will be the result.
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
      * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
-     * should be a boolean.
+     * should be a boolean value.
      *
      * @param callable $predicate
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     public function filter(callable $predicate): Collection
     {
-        return new Collection($this->type->getName(), \array_filter($this->elements, $predicate, ARRAY_FILTER_USE_BOTH));
+        return new Collection($this->type->getName(), array_filter($this->elements, $predicate, ARRAY_FILTER_USE_BOTH));
     }
 
     /**
@@ -654,10 +701,10 @@ class Collection implements \Countable, \IteratorAggregate
      * As soon as the predicate has returned true the iteration will be stopped and the element will be returned.
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
      * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
-     * should be a boolean.
+     * should be a boolean value.
      *
      * @param callable $predicate
-     * @return null|mixed
+     * @return T|null
      */
     public function find(callable $predicate)
     {
@@ -679,21 +726,22 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
      * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
-     * should be a boolean.
+     * should be a boolean value.
      *
      * @param callable $predicate
      * @param callable ...$predicates
-     * @throws CollectionException
      * @return Collection
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function group(callable $predicate, callable ...$predicates): Collection
     {
-        \array_unshift($predicates, $predicate);
-        $numPredicates = \count($predicates);
+        array_unshift($predicates, $predicate);
+        $numPredicates = count($predicates);
 
         return $this->mapCollectionArraysToCollection(
-            \array_reduce(
-                \array_keys($this->elements),
+            array_reduce(
+                array_keys($this->elements),
                 function (array $result, int $key) use ($predicates, $numPredicates): array {
                     $value = $this->elements[$key];
                     foreach ($predicates as $index => $predicate) {
@@ -707,7 +755,7 @@ class Collection implements \Countable, \IteratorAggregate
 
                     return $result;
                 },
-                \array_fill(0, $numPredicates, [])
+                array_fill(0, $numPredicates, [])
             )
         );
     }
@@ -719,17 +767,18 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * The predicate callback should accept 2 parameters at max. The first parameter should accept the same type as this
      * collection has and the second parameter is optionally and must accept an integer. The return type of the predicate
-     * should be a boolean.
+     * should be a boolean value.
      *
      * @param callable $predicate
-     * @throws CollectionException
      * @return Collection
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function partition(callable $predicate): Collection
     {
         return $this->mapCollectionArraysToCollection(
-            \array_reduce(
-                \array_keys($this->elements),
+            array_reduce(
+                array_keys($this->elements),
                 function (array $result, int $index) use ($predicate): array {
                     $element = $this->elements[$index];
                     $result[$predicate($element, $index) ? 0 : 1] = $element;
@@ -746,7 +795,7 @@ class Collection implements \Countable, \IteratorAggregate
      * this collection.
      *
      * The offset must be a negative or non-negative integer.
-     * The length is optional an can be a negative or non-negative integer.
+     * The length is optional and can be a negative or non-negative integer.
      *
      * Offset:
      *
@@ -762,15 +811,16 @@ class Collection implements \Countable, \IteratorAggregate
      *
      *
      * @param int $offset
-     * @param null|int $length
-     * @throws CollectionException
+     * @param int|null $length
      * @return Collection
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public function slice(int $offset, ?int $length = null): Collection
     {
         return new Collection(
             __CLASS__,
-            \array_slice(
+            array_slice(
                 $this->elements,
                 $offset,
                 $length
@@ -797,7 +847,7 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function count(): int
     {
-        return \count($this->elements);
+        return count($this->elements);
     }
 
     /**
@@ -807,20 +857,20 @@ class Collection implements \Countable, \IteratorAggregate
      */
     public function getIterator(): CollectionIterator
     {
-        return new CollectionIterator(new \ArrayIterator($this->elements));
+        return new CollectionIterator(new ArrayIterator($this->elements));
     }
 
     /**
      * Check whether the passed collection is equal to this collection. When $strict is true also the order of elements
      * needs to be the same. A collection is considered to be equal when both collections are of the same type, have the
-     * same count and all elements from this collection can be found in the passed Collection. To determine if 2 elements
+     * same count and all elements from this collection can be found the given Collection. To determine if 2 elements
      * should be considered equal the predicate function will be invoked.
      * The predicate function must accept 2 arguments of the same type this collection and should return a boolean value.
      * When the predicate function is omitted the default comparison will be strictly equals (=== comparison operator will
      * be used).
      *
      * @param Collection $otherCollection
-     * @param null|callable $predicate
+     * @param callable|null $predicate
      * @param bool $strict
      * @return bool
      */
@@ -836,7 +886,7 @@ class Collection implements \Countable, \IteratorAggregate
 
     /**
      * Compare if this collection and the passed collection are equal. The collections are considered equal when all
-     * elements of this collection are found in the passed collection in the same order. The predicate callback is used
+     * elements of this collection are found in the given collection in the same order. The predicate callback is used
      * to determine if 2 elements should be considered equal.
      *
      * @param Collection $otherCollection
@@ -864,7 +914,7 @@ class Collection implements \Countable, \IteratorAggregate
 
     /**
      * Compare if this collection and the passed collection are equal. The collections are considered equal when all
-     * elements of this collection are found in the passed collection not necessary in the same order. The predicate
+     * elements of this collection are found in the given collection not necessary in the same order. The predicate
      * callback is used to determine if 2 elements should be considered equal.
      *
      * @param Collection $otherCollection
@@ -883,7 +933,7 @@ class Collection implements \Countable, \IteratorAggregate
         $leftElements = $this->toArray();
         $rightElements = $otherCollection->toArray();
         while (!empty($leftElements)) {
-            $leftElement = \array_pop($leftElements);
+            $leftElement = array_pop($leftElements);
             $found = false;
             foreach ($rightElements as $index => $rightElement) {
                 if (true === $predicate($leftElement, $rightElement)) {
@@ -915,8 +965,9 @@ class Collection implements \Countable, \IteratorAggregate
      *
      * @param string $type
      * @param Collection[] $collections
-     * @throws CollectionException
      * @return Collection
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     public static function createFromCollections(string $type, array $collections): Collection
     {
@@ -934,33 +985,28 @@ class Collection implements \Countable, \IteratorAggregate
 
     /**
      * @param mixed $element
-     * @throws CollectionException
      * @return void
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     private function assertElementIsValid($element): void
     {
         if (!$this->type->isAssignableValue($element)) {
-            $otherType = self::createTypeFromValue($element);
-            throw new CollectionException(\sprintf(
-                'Data is not %s: `%s`, but %s: `%s`',
-                $this->type instanceof ClassType ? 'an instance of' : 'of expected type',
-                $this->type->getName(),
-                $otherType instanceof ClassType ? 'an instance of' : 'of type',
-                $otherType->getName()
-            ));
+            throw CollectionException::dataOfInvalidTypeGiven($this->type, self::createTypeFromValue($element));
         }
     }
 
     /**
      * @param array[] $collectionArrays
      * @throws CollectionException
+     * @throws RuntimeException
      * @return Collection
      */
     private function mapCollectionArraysToCollection(array $collectionArrays): Collection
     {
         return new Collection(
             __CLASS__,
-            \array_map(
+            array_map(
                 function (array $elements): Collection {
                     return new Collection($this->type->getName(), $elements);
                 },
@@ -978,33 +1024,30 @@ class Collection implements \Countable, \IteratorAggregate
     private static function assertCollections(array $collections, TypeInterface $typeValue): void
     {
         if (empty($collections)) {
-            throw new CollectionException('An empty array with typed collections passed');
+            throw CollectionException::emptyCollection();
         }
-        if (\count($collections) < 2) {
-            throw new CollectionException('At least 2 collections needs to be passed');
+        if (count($collections) < 2) {
+            throw CollectionException::notEnoughCollections();
         }
         foreach ($collections as $collection) {
             if (!$collection instanceof self) {
-                throw new CollectionException('Expect $collections array to contain instances of Collection');
+                throw CollectionException::invalidCollectionsData();
             }
             if (!$typeValue->isAssignableType($collection->type)) {
-                throw new CollectionException(\sprintf(
-                    'Expect every collection to be of type: `%s`. Collection found with type: `%s`',
-                    $typeValue->getName(),
-                    $collection->type->getName()
-                ));
+                throw CollectionException::collectionNotAllOfSameType($typeValue, $collection->type);
             }
         }
     }
 
     /**
      * @param string $type
-     * @throws CollectionException
      * @return void
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     private static function assertType(string $type): void
     {
-        if (\in_array(\strtolower($type), ['mixed', 'null', 'void'])) {
+        if (in_array(strtolower($type), ['mixed', 'null', 'void'])) {
             throw CollectionException::typeIsNotValid($type);
         }
 
@@ -1014,6 +1057,7 @@ class Collection implements \Countable, \IteratorAggregate
     /**
      * @param array $elements
      * @return Collection
+     * @throws RuntimeException
      * @throws CollectionException
      */
     public static function createFromElements(array $elements): Collection
@@ -1022,13 +1066,14 @@ class Collection implements \Countable, \IteratorAggregate
             throw CollectionException::emptyElementsCanNotDetermineType();
         }
 
-        return new self((self::createTypeFromValue(\reset($elements)))->getName(), $elements);
+        return new self((self::createTypeFromValue(reset($elements)))->getName(), $elements);
     }
 
     /**
      * @param mixed $value
-     * @throws CollectionException
      * @return TypeInterface
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     private static function createTypeFromValue($value): TypeInterface
     {
@@ -1041,8 +1086,9 @@ class Collection implements \Countable, \IteratorAggregate
 
     /**
      * @param string $name
-     * @throws CollectionException
      * @return TypeInterface
+     * @throws RuntimeException
+     * @throws CollectionException
      */
     private static function createTypeFromName(string $name): TypeInterface
     {
