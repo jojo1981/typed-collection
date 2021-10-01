@@ -16,7 +16,6 @@ use IteratorAggregate;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
-use Jojo1981\PhpTypes\Value\ClassName;
 use Jojo1981\TypedCollection\Exception\CollectionException;
 use function array_fill;
 use function array_filter;
@@ -37,7 +36,6 @@ use function in_array;
 use function is_array;
 use function reset;
 use function sprintf;
-use function strpos;
 use function strtolower;
 use function usort;
 
@@ -79,12 +77,7 @@ class Collection implements Countable, IteratorAggregate
      */
     public function getType(): string
     {
-        $name = $this->type->getName();
-        if ($this->type->isClass() && 0 !== strpos($name, ClassName::NAMESPACE__SEPARATOR)) {
-            $name = ClassName::NAMESPACE__SEPARATOR . $name;
-        }
-
-        return $name;
+        return $this->type->getName();
     }
 
     /**

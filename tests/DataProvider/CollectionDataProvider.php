@@ -58,10 +58,10 @@ final class CollectionDataProvider
             ['iterable', 'iterable'],
             ['callable', 'callable'],
             ['callback', 'callable'],
-            [TestEntity::class , '\\' . TestEntity::class],
-            [TestEntityBase::class, '\\' . TestEntityBase::class],
-            [AbstractTestEntity::class, '\\' . AbstractTestEntity::class],
-            [InterfaceTestEntity::class, '\\' . InterfaceTestEntity::class]
+            [TestEntity::class , TestEntity::class],
+            [TestEntityBase::class, TestEntityBase::class],
+            [AbstractTestEntity::class, AbstractTestEntity::class],
+            [InterfaceTestEntity::class, InterfaceTestEntity::class]
         ];
     }
 

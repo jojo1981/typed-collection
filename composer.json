@@ -20,7 +20,7 @@
   "prefer-stable": true,
   "require": {
     "php": "^7.4|^8.0",
-    "jojo1981/php-types": "^2.0|^3.0"
+    "jojo1981/php-types": "^3.0"
   },
   "require-dev": {
     "dg/bypass-finals": "^1.3",
