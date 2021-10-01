@@ -16,8 +16,8 @@ use IteratorAggregate;
 use Jojo1981\PhpTypes\AbstractType;
 use Jojo1981\PhpTypes\Exception\TypeException;
 use Jojo1981\PhpTypes\TypeInterface;
+use Jojo1981\PhpTypes\Value\ClassName;
 use Jojo1981\TypedCollection\Exception\CollectionException;
-use RuntimeException;
 use function array_fill;
 use function array_filter;
 use function array_keys;
@@ -37,6 +37,7 @@ use function in_array;
 use function is_array;
 use function reset;
 use function sprintf;
+use function strpos;
 use function strtolower;
 use function usort;
 
@@ -63,7 +64,6 @@ class Collection implements Countable, IteratorAggregate
      * @param string $type
      * @param T[] $elements (optional)
      * @throws CollectionException
-     * @throws RuntimeException
      */
     public function __construct(string $type, array $elements = [])
     {
@@ -79,7 +79,12 @@ class Collection implements Countable, IteratorAggregate
      */
     public function getType(): string
     {
-        return $this->type->getName();
+        $name = $this->type->getName();
+        if ($this->type->isClass() && 0 !== strpos($name, ClassName::NAMESPACE__SEPARATOR)) {
+            $name = ClassName::NAMESPACE__SEPARATOR . $name;
+        }
+
+        return $name;
     }
 
     /**
@@ -119,7 +124,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param mixed $element
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function unshiftElement($element): self
@@ -135,7 +139,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param mixed $element
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function pushElement($element): self
@@ -175,7 +178,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param T $element
      * @return bool
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function hasElement($element): bool
@@ -190,7 +192,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param T[] $elements
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function pushElements(array $elements): self
@@ -207,7 +208,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param T[] $elements
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function unshiftElements(array $elements): self
@@ -222,7 +222,6 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @param T[] $elements
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function setElements(array $elements): self
@@ -240,7 +239,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param mixed $element
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function removeElement($element): self
@@ -262,7 +260,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param T $element
      * @return int|null
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function indexOfElement($element): ?int
@@ -279,7 +276,6 @@ class Collection implements Countable, IteratorAggregate
      * Returns a new Collection with all elements in reverse order.
      *
      * @return Collection
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function reverse(): Collection
@@ -294,7 +290,6 @@ class Collection implements Countable, IteratorAggregate
      * @param int $number
      * @return Collection
      * @throws InvalidArgumentException
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function drop(int $number): Collection
@@ -313,7 +308,6 @@ class Collection implements Countable, IteratorAggregate
      * @param int $number
      * @return Collection
      * @throws InvalidArgumentException
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function dropRight(int $number): Collection
@@ -330,9 +324,8 @@ class Collection implements Countable, IteratorAggregate
      * The callback function receives the element to drop as first argument, and returns true (drop), or false (stop).
      *
      * @param callable $callback
-     * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
+     * @throws CollectionException
      */
     public function dropWhile(callable $callback): Collection
     {
@@ -354,10 +347,9 @@ class Collection implements Countable, IteratorAggregate
      * will be returned as a new collection.
      *
      * @param int $number
-     * @throws CollectionException
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
      * @return Collection
+     * @throws InvalidArgumentException
+     * @throws CollectionException
      */
     public function take(int $number): Collection
     {
@@ -373,9 +365,8 @@ class Collection implements Countable, IteratorAggregate
      * for as long as the callable returns true.
      *
      * @param callable $callable
-     * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
+     * @throws CollectionException
      */
     public function takeWhile(callable $callable): Collection
     {
@@ -431,9 +422,8 @@ class Collection implements Countable, IteratorAggregate
      * Get the first element of this collection as a new collection with 1 element. When this collection is empty a new
      * empty collection will be returned. The newly returned collection has the same type as this collection.
      *
-     * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
+     * @throws CollectionException
      */
     public function getFirstElementAsCollection(): Collection
     {
@@ -462,7 +452,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param callable $comparator
      * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
      */
     public function sortBy(callable $comparator): Collection
@@ -485,7 +474,6 @@ class Collection implements Countable, IteratorAggregate
      * @param string $type
      * @param callable $mapper
      * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
      */
     public function map(string $type, callable $mapper): Collection
@@ -515,7 +503,6 @@ class Collection implements Countable, IteratorAggregate
      * @param string $type
      * @param callable $mapper
      * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
      */
     public function flatMap(string $type, callable $mapper): Collection
@@ -539,7 +526,6 @@ class Collection implements Countable, IteratorAggregate
      * @param Collection $otherCollection
      * @param Collection ...$otherCollections
      * @return $this
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function merge(Collection $otherCollection, Collection ...$otherCollections): self
@@ -686,7 +672,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param callable $predicate
      * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
      */
     public function filter(callable $predicate): Collection
@@ -731,7 +716,6 @@ class Collection implements Countable, IteratorAggregate
      * @param callable $predicate
      * @param callable ...$predicates
      * @return Collection
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function group(callable $predicate, callable ...$predicates): Collection
@@ -771,7 +755,6 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param callable $predicate
      * @return Collection
-     * @throws RuntimeException
      * @throws CollectionException
      */
     public function partition(callable $predicate): Collection
@@ -812,9 +795,8 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param int $offset
      * @param int|null $length
-     * @return Collection
-     * @throws RuntimeException
      * @throws CollectionException
+     * @return Collection
      */
     public function slice(int $offset, ?int $length = null): Collection
     {
@@ -965,9 +947,8 @@ class Collection implements Countable, IteratorAggregate
      *
      * @param string $type
      * @param Collection[] $collections
-     * @return Collection
-     * @throws RuntimeException
      * @throws CollectionException
+     * @return Collection
      */
     public static function createFromCollections(string $type, array $collections): Collection
     {
@@ -986,7 +967,6 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @param mixed $element
      * @return void
-     * @throws RuntimeException
      * @throws CollectionException
      */
     private function assertElementIsValid($element): void
@@ -999,7 +979,6 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @param array[] $collectionArrays
      * @throws CollectionException
-     * @throws RuntimeException
      * @return Collection
      */
     private function mapCollectionArraysToCollection(array $collectionArrays): Collection
@@ -1042,7 +1021,6 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @param string $type
      * @return void
-     * @throws RuntimeException
      * @throws CollectionException
      */
     private static function assertType(string $type): void
@@ -1056,9 +1034,8 @@ class Collection implements Countable, IteratorAggregate
 
     /**
      * @param array $elements
-     * @return Collection
-     * @throws RuntimeException
      * @throws CollectionException
+     * @return Collection
      */
     public static function createFromElements(array $elements): Collection
     {
@@ -1072,7 +1049,6 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @param mixed $value
      * @return TypeInterface
-     * @throws RuntimeException
      * @throws CollectionException
      */
     private static function createTypeFromValue($value): TypeInterface
@@ -1087,7 +1063,6 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @param string $name
      * @return TypeInterface
-     * @throws RuntimeException
      * @throws CollectionException
      */
     private static function createTypeFromName(string $name): TypeInterface
