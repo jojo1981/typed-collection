@@ -504,6 +504,9 @@ class Collection implements Countable, IteratorAggregate
         $results = [];
         foreach ($this->elements as $index => $value) {
             $mapperResult = $mapper($value, $index);
+            if ($mapperResult instanceof Collection) {
+                $mapperResult = $mapperResult->toArray();
+            }
             $values = !is_array($mapperResult) ? [$mapperResult] : array_values($mapperResult);
             if (!empty($values)) {
                 array_push($results, ...$values);
