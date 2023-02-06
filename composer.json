@@ -19,8 +19,8 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": "^7.4|^8.0",
-    "jojo1981/php-types": "^3.0"
+    "php": "^8.0",
+    "jojo1981/php-types": "^4.0"
   },
   "require-dev": {
     "dg/bypass-finals": "^1.3",

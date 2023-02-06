@@ -38,7 +38,7 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
      * @throws BadMethodCallException
      * @return void
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new BadMethodCallException(
             'Don\'t use array access to add an element but use ' . Collection::class . '::addElement'
@@ -50,7 +50,7 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
      * @throws BadMethodCallException
      * @return void
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         throw new BadMethodCallException(
             'Don\'t use array access to add an element but use ' . Collection::class . '::removeElement'
@@ -60,7 +60,7 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
     /**
      * @return mixed
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->arrayIterator->current();
     }
@@ -74,9 +74,9 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
     }
 
     /**
-     * @return mixed
+     * @return string|int|null
      */
-    public function key()
+    public function key(): string|int|null
     {
         return $this->arrayIterator->key();
     }
@@ -101,7 +101,7 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
      * @param int $offset
      * @return void
      */
-    public function seek($offset): void
+    public function seek(int $offset): void
     {
         $this->arrayIterator->seek($offset);
     }
@@ -110,7 +110,7 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return $this->arrayIterator->offsetExists($offset);
     }
@@ -119,7 +119,7 @@ final class CollectionIterator implements SeekableIterator, ArrayAccess, Countab
      * @param mixed $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->arrayIterator->offsetGet($offset);
     }
