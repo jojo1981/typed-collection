@@ -1,7 +1,7 @@
 A typed collection data structure
 =====================
 
-[![Build Status](https://travis-ci.com/jojo1981/typed-collection.svg?branch=master)](https://travis-ci.com/jojo1981/typed-collection)
+[![Build Status](https://github.com/jojo1981/typed-collection/actions/workflows/build.yml/badge.svg)](https://github.com/jojo1981/typed-collection/actions/workflows/build.yml)
 [![Coverage Status](https://coveralls.io/repos/github/jojo1981/typed-collection/badge.svg)](https://coveralls.io/github/jojo1981/typed-collection)
 [![Latest Stable Version](https://poser.pugx.org/jojo1981/typed-collection/v/stable)](https://packagist.org/packages/jojo1981/typed-collection)
 [![Total Downloads](https://poser.pugx.org/jojo1981/typed-collection/downloads)](https://packagist.org/packages/jojo1981/typed-collection)
