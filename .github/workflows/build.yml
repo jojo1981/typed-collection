@@ -15,8 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        php-version: [ 8.0, 8.1, 8.2, 8.3, 8.4 ]
+        php-version: [ "8.0", "8.1", "8.2", "8.3", "8.4" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +43,24 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
+
+      - name: Lint PHP files
+        run: |
+          find . -type f -name '*.php' -not -path './vendor/*' -not -path './var/*' -print0 | while IFS= read -r -d '' file; do
+            php -l "$file"
+          done
+
+      - name: Code Quality (PHPStan)
+        run: |
+          composer global require phpstan/phpstan
+          if [[ "${{ matrix.php-version }}" == "8.0" || "${{ matrix.php-version }}" == "8.1" ]]; then
+            echo "Using legacy PHPStan configuration for PHP ${{ matrix.php-version }}"
+            cp phpstan-legacy.neon phpstan.neon
+          else
+            echo "Using modern PHPStan configuration for PHP ${{ matrix.php-version }}"
+            cp phpstan-modern.neon phpstan.neon
+          fi
+          phpstan analyse src --level=5
 
       - name: Run test suite
         run: composer run-script test
