@@ -1,0 +1,6 @@
+parameters:
+  treatPhpDocTypesAsCertain: false
+  ignoreErrors:
+    - '#Unsafe call to private method Jojo1981\\TypedCollection\\Collection<T>::assertType\(\) through static::.#'
+    - '#Method Jojo1981\\TypedCollection\\CollectionIterator::key\(\) never returns null so it can be removed from the return type#'
+    - '#Strict comparison using === between false and true will always evaluate to false#'
