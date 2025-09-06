@@ -66,6 +66,7 @@ jobs:
         run: composer run-script test
 
       - name: Upload coverage results to Coveralls
+        if: github.event_name == 'push'
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
